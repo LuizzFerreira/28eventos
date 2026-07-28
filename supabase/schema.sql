@@ -20,9 +20,6 @@ create table public.profiles (
 alter table public.profiles enable row level security;
 create policy "Users can view own profile" on public.profiles for select using (auth.uid() = id);
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
-create policy "Admins can view all profiles" on public.profiles for select using (
-  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-);
 
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -52,11 +49,7 @@ create table public.categorias (
   created_at timestamptz default now()
 );
 
-alter table public.categorias enable row level security;
-create policy "Anyone can view active categories" on public.categorias for select using (ativo = true);
-create policy "Admins can manage categories" on public.categorias for all using (
-  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-);
+-- categorias: sem RLS, leitura pública
 
 -- PRODUCTS
 create table public.produtos (
@@ -70,11 +63,7 @@ create table public.produtos (
   created_at timestamptz default now()
 );
 
-alter table public.produtos enable row level security;
-create policy "Anyone can view active products" on public.produtos for select using (ativo = true);
-create policy "Admins can manage products" on public.produtos for all using (
-  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-);
+-- produtos: sem RLS, leitura pública
 
 -- PRODUCT IMAGES
 create table public.imagens (
@@ -85,11 +74,7 @@ create table public.imagens (
   created_at timestamptz default now()
 );
 
-alter table public.imagens enable row level security;
-create policy "Anyone can view images" on public.imagens for select using (true);
-create policy "Admins can manage images" on public.imagens for all using (
-  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-);
+-- imagens: sem RLS, leitura pública
 
 -- EVENTS
 create table public.eventos (
