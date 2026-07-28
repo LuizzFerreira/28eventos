@@ -52,6 +52,8 @@ export interface Product {
   imagens?: ProductImage[]
   ativo: boolean
   destaque: boolean
+  duracao?: string
+  videos?: string[]
   created_at: string
 }
 

@@ -6,7 +6,6 @@ import { z } from 'zod'
 import { useAuth } from '@/context/AuthContext'
 import { eventService } from '@/services/event.service'
 import { productService } from '@/services/product.service'
-import { categoryService } from '@/services/product.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
 import { Input, Select } from '@/components/ui/Input'
@@ -14,6 +13,7 @@ import { formatCurrency, fetchAddressByCEP, formatCEP } from '@/utils/cn'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { Check, ChevronRight, Minus, Plus, ShoppingCart } from 'lucide-react'
+import { ProductSearch } from '@/components/ui/ProductSearch'
 import type { EventType, Product } from '@/types'
 
 const steps = ['Tipo', 'Dados', 'Local', 'Aniversariante', 'Serviços']
@@ -54,7 +54,6 @@ export default function CreateEventPage() {
   const [idadeAniversariante, setIdadeAniversariante] = useState('')
   const [sexoAniversariante, setSexoAniversariante] = useState('')
   const [cart, setCart] = useState<{ produto: Product; quantidade: number }[]>([])
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [_eventId, setEventId] = useState<string | null>(null)
 
   const { profile } = useAuth()
@@ -64,10 +63,9 @@ export default function CreateEventPage() {
   const form2 = useForm({ resolver: zodResolver(step2Schema) })
   const form3 = useForm({ resolver: zodResolver(step3Schema) })
 
-  const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: categoryService.getCategories })
   const { data: products } = useQuery({
-    queryKey: ['products', activeCategory],
-    queryFn: () => productService.getProducts(activeCategory ?? undefined),
+    queryKey: ['products', null],
+    queryFn: () => productService.getProducts(),
     enabled: step === 4,
   })
 
@@ -303,27 +301,11 @@ export default function CreateEventPage() {
               <div className="lg:col-span-2 space-y-4">
                 <h2 className="text-xl font-bold text-white">Selecione os serviços</h2>
 
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  <button
-                    onClick={() => setActiveCategory(null)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                      !activeCategory ? 'gold-gradient text-black' : 'glass text-white/60'
-                    }`}
-                  >
-                    Todos
-                  </button>
-                  {categories?.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setActiveCategory(cat.id)}
-                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                        activeCategory === cat.id ? 'gold-gradient text-black' : 'glass text-white/60'
-                      }`}
-                    >
-                      {cat.nome}
-                    </button>
-                  ))}
-                </div>
+                <ProductSearch
+                  products={products ?? []}
+                  onSelect={addToCart}
+                  placeholder="Buscar serviço... ex: DJ, foto, brinquedos"
+                />
 
                 <div className="grid sm:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-1">
                   {products?.map(product => {

@@ -6,18 +6,21 @@ import { categoryService } from '@/services/product.service'
 import { CardSkeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { LoginModal } from '@/components/ui/LoginModal'
+import { ServiceDetailModal } from '@/components/ui/ServiceDetailModal'
 import { formatCurrency } from '@/utils/cn'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Heart, Plus, Star, Search } from 'lucide-react'
+import { Plus, Star, Search, Eye } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { favoriteService } from '@/services/extra.service'
 import { toast } from 'sonner'
+import type { Product } from '@/types'
 
 export default function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [loginOpen, setLoginOpen] = useState(false)
+  const [selected, setSelected] = useState<Product | null>(null)
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -44,6 +47,7 @@ export default function ServicesPage() {
 
   function handleAddToEvent() {
     if (!user) { setLoginOpen(true); return }
+    setSelected(null)
     navigate('/dashboard/criar-evento')
   }
 
@@ -106,7 +110,8 @@ export default function ServicesPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="glass rounded-2xl overflow-hidden card-hover group"
+                className="glass rounded-2xl overflow-hidden card-hover group cursor-pointer"
+                onClick={() => setSelected(product)}
               >
                 <div className="relative h-52 overflow-hidden">
                   <img
@@ -120,12 +125,11 @@ export default function ServicesPage() {
                       <Star size={10} /> Destaque
                     </div>
                   )}
-                  <button
-                    onClick={() => handleFavorite(product.id)}
-                    className="absolute top-3 right-3 w-8 h-8 glass rounded-full flex items-center justify-center text-white/60 hover:text-red-400 transition-colors cursor-pointer"
-                  >
-                    <Heart size={14} />
-                  </button>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 bg-black/60 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                      <Eye size={13} /> Ver detalhes
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-4">
@@ -138,7 +142,7 @@ export default function ServicesPage() {
                       <span className="text-white/40 text-xs">A partir de</span>
                       <div className="text-[#c9a84c] font-bold">{formatCurrency(product.preco)}</div>
                     </div>
-                    <Button size="sm" onClick={handleAddToEvent}>
+                    <Button size="sm" onClick={e => { e.stopPropagation(); handleAddToEvent() }}>
                       <Plus size={14} /> Adicionar
                     </Button>
                   </div>
@@ -156,6 +160,12 @@ export default function ServicesPage() {
       </div>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <ServiceDetailModal
+        product={selected}
+        onClose={() => setSelected(null)}
+        onAddToEvent={handleAddToEvent}
+        onFavorite={handleFavorite}
+      />
     </>
   )
 }

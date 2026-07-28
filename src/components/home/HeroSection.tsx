@@ -70,10 +70,10 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-none mb-6"
+            className="text-5xl sm:text-7xl lg:text-7xl font-black text-white leading-none mb-6"
           >
-            Seu evento,{' '}
-            <span className="gold-text block">nossa arte.</span>
+            Tudo para o seu evento,{' '}
+            <span className="gold-text block">em um só lugar.</span>
           </motion.h1>
 
           <motion.p
@@ -100,37 +100,9 @@ export function HeroSection() {
             </Button>
           </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="flex flex-wrap items-center justify-center gap-8 mt-16"
-          >
-            {[
-              { value: '500+', label: 'Eventos realizados' },
-              { value: '98%', label: 'Satisfação' },
-              { value: '10+', label: 'Anos de experiência' },
-              { value: '50+', label: 'Parceiros' },
-            ].map(stat => (
-              <div key={stat.label} className="text-center">
-                <div className="text-2xl font-black gold-text">{stat.value}</div>
-                <div className="text-white/40 text-xs mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
-            <div className="w-1 h-3 bg-[#c9a84c] rounded-full" />
-          </div>
-        </motion.div>
+
+        </div>
       </section>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
