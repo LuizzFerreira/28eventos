@@ -25,12 +25,14 @@ export function ServicesSection() {
     retry: 0,
   })
 
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, error: productsError } = useQuery({
     queryKey: ['products', activeCategory],
     queryFn: () => productService.getProducts(activeCategory ?? undefined),
     enabled: !!isSupabaseConfigured,
     retry: 0,
   })
+
+  if (productsError) console.error('[ServicesSection] erro ao buscar produtos:', productsError)
 
   function handleAddToEvent() {
     if (!user) { setLoginOpen(true); return }
