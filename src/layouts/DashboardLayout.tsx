@@ -40,7 +40,7 @@ export function DashboardLayout() {
       >
         <div className="p-6 border-b border-white/5">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-xl font-black gold-text">LG</span>
+            <span className="text-xl font-black gold-text">28</span>
             <span className="text-white font-light tracking-widest text-sm">EVENTOS</span>
           </Link>
         </div>

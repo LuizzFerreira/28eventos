@@ -115,7 +115,7 @@ export function ContactSection() {
               Falar no WhatsApp
             </a>
             <a
-              href="mailto:contato@lgeventos.com.br"
+              href="mailto:contato@28eventos.com.br"
               className="inline-flex items-center gap-2 border border-[#c9a84c] text-[#c9a84c] font-semibold px-8 py-4 rounded-xl hover:bg-[#c9a84c]/10 transition-colors"
             >
               Enviar e-mail

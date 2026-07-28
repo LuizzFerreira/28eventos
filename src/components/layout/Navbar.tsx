@@ -39,7 +39,7 @@ export function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-black gold-text tracking-tight">LG</span>
+            <span className="text-2xl font-black gold-text tracking-tight">28</span>
             <span className="text-white font-light text-lg tracking-widest">EVENTOS</span>
           </Link>
 

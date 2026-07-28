@@ -62,7 +62,7 @@ export function AboutSection() {
             <span className="gold-text">uma experiência.</span>
           </h2>
           <p className="text-white/60 leading-relaxed mb-6">
-            A LG Eventos nasceu da paixão por criar momentos inesquecíveis. Com mais de 10 anos de experiência, somos referência em eventos premium no Brasil.
+            A 28 Eventos nasceu da paixão por criar momentos inesquecíveis. Com mais de 10 anos de experiência, somos referência em eventos premium no Brasil.
           </p>
           <p className="text-white/60 leading-relaxed mb-8">
             Nossa missão é transformar cada celebração em uma obra de arte, cuidando de cada detalhe com dedicação e excelência.

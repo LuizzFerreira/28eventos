@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-3xl font-black gold-text">LG</span>
+              <span className="text-3xl font-black gold-text">28</span>
               <span className="text-white font-light text-xl tracking-widest">EVENTOS</span>
             </div>
             <p className="text-white/50 text-sm leading-relaxed max-w-xs">
@@ -53,7 +53,7 @@ export function Footer() {
                 <Phone size={14} className="text-[#c9a84c]" /> (11) 99999-9999
               </li>
               <li className="flex items-center gap-2 text-white/50 text-sm">
-                <Mail size={14} className="text-[#c9a84c]" /> contato@lgeventos.com.br
+                <Mail size={14} className="text-[#c9a84c]" /> contato@28eventos.com.br
               </li>
               <li className="flex items-center gap-2 text-white/50 text-sm">
                 <MapPin size={14} className="text-[#c9a84c]" /> São Paulo, SP
@@ -63,7 +63,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/5 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-white/30 text-xs">© 2025 LG Eventos. Todos os direitos reservados.</p>
+          <p className="text-white/30 text-xs">© 2025 28 Eventos. Todos os direitos reservados.</p>
           <p className="text-white/20 text-xs">Feito com ❤️ para momentos inesquecíveis</p>
         </div>
       </div>

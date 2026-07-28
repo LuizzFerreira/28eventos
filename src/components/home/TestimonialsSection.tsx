@@ -10,7 +10,7 @@ const testimonials = [
   {
     name: 'Ana Carolina',
     event: 'Casamento',
-    text: 'A LG Eventos superou todas as nossas expectativas. Cada detalhe foi pensado com carinho e profissionalismo. Nosso casamento foi simplesmente perfeito!',
+    text: 'A 28 Eventos superou todas as nossas expectativas. Cada detalhe foi pensado com carinho e profissionalismo. Nosso casamento foi simplesmente perfeito!',
     rating: 5,
     avatar: 'https://i.pravatar.cc/100?img=1',
   },
@@ -31,7 +31,7 @@ const testimonials = [
   {
     name: 'Carlos Eduardo',
     event: 'Corporativo',
-    text: 'Realizamos nosso evento corporativo com a LG e o resultado foi excepcional. Transmissão ao vivo perfeita e estrutura impecável.',
+    text: 'Realizamos nosso evento corporativo com a 28 Eventos e o resultado foi excepcional. Transmissão ao vivo perfeita e estrutura impecável.',
     rating: 5,
     avatar: 'https://i.pravatar.cc/100?img=7',
   },
