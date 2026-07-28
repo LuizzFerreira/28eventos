@@ -111,7 +111,8 @@ export default function AdminDashboard() {
               <Tooltip
                 contentStyle={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12 }}
                 labelStyle={{ color: '#fff' }}
-                formatter={(value: number): [string, string] => [formatCurrency(value), 'Receita']}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(value: any) => [formatCurrency(value), 'Receita']}
               />
               <Line type="monotone" dataKey="receita" stroke="#c9a84c" strokeWidth={2} dot={{ fill: '#c9a84c', r: 4 }} />
             </LineChart>
