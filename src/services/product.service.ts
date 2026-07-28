@@ -5,7 +5,7 @@ export const productService = {
   async getProducts(categoryId?: string) {
     let query = supabase
       .from('produtos')
-      .select('*, categorias(*), imagens(*)')
+      .select('*, categoria:categorias(*), imagens(*)')
       .eq('ativo', true)
       .order('destaque', { ascending: false })
     if (categoryId) query = query.eq('categoria_id', categoryId)
@@ -17,7 +17,7 @@ export const productService = {
   async getFeatured() {
     const { data, error } = await supabase
       .from('produtos')
-      .select('*, categorias(*), imagens(*)')
+      .select('*, categoria:categorias(*), imagens(*)')
       .eq('ativo', true)
       .eq('destaque', true)
       .limit(8)
@@ -28,7 +28,7 @@ export const productService = {
   async getProduct(id: string) {
     const { data, error } = await supabase
       .from('produtos')
-      .select('*, categorias(*), imagens(*)')
+      .select('*, categoria:categorias(*), imagens(*)')
       .eq('id', id)
       .single()
     if (error) throw error
@@ -64,7 +64,7 @@ export const productService = {
   async getAllAdmin() {
     const { data, error } = await supabase
       .from('produtos')
-      .select('*, categorias(*), imagens(*)')
+      .select('*, categoria:categorias(*), imagens(*)')
       .order('created_at', { ascending: false })
     if (error) throw error
     return data as Product[]
