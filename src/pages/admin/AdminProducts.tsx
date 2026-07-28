@@ -12,6 +12,8 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import type { Product } from '@/types'
 
+import { ImageManager } from '@/components/admin/ImageManager'
+
 export default function AdminProducts() {
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -54,7 +56,10 @@ export default function AdminProducts() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => productService.deleteProduct(id),
+    mutationFn: async (id: string) => {
+      await productService.deleteProductImages(id)
+      await productService.deleteProduct(id)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] })
       toast.success('Produto removido!')
@@ -183,6 +188,9 @@ export default function AdminProducts() {
               <span className="text-white/70 text-sm">Destaque</span>
             </label>
           </div>
+          
+          {editing && <ImageManager productId={editing.id} />}
+
           <div className="flex gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { setModalOpen(false); reset() }}>Cancelar</Button>
             <Button type="submit" loading={createMutation.isPending || updateMutation.isPending}>

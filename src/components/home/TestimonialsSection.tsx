@@ -135,10 +135,9 @@ export function GallerySection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className={`relative overflow-hidden rounded-2xl group cursor-pointer ${
+            className={`relative overflow-hidden rounded-2xl group cursor-pointer aspect-video ${
               i === 0 ? 'md:col-span-2 md:row-span-2' : ''
             }`}
-            style={{ height: i === 0 ? '400px' : '190px' }}
           >
             <img
               src={img}

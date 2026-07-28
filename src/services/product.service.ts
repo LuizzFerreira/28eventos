@@ -69,6 +69,54 @@ export const productService = {
     if (error) throw error
     return data as Product[]
   },
+
+  async uploadImage(file: File) {
+    const fileName = `${crypto.randomUUID()}-${file.name}`
+    const { data, error } = await supabase
+      .storage
+      .from('product-images')
+      .upload(fileName, file)
+    if (error) throw error
+    const { data: { publicUrl } } = supabase.storage.from('product-images').getPublicUrl(data.path)
+    return publicUrl
+  },
+
+  async createProductImage(produto_id: string, url: string, ordem = 0) {
+    const { data, error } = await supabase
+      .from('imagens')
+      .insert({ produto_id, url, ordem })
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  async deleteProductImage(id: string) {
+    // First get the image url to delete from storage
+    const { data: imgData, error: imgErr } = await supabase.from('imagens').select('url').eq('id', id).single()
+    if (imgErr) throw imgErr
+
+    const fileName = imgData.url.split('/').pop()
+    if (fileName) {
+      await supabase.storage.from('product-images').remove([fileName])
+    }
+
+    const { error } = await supabase.from('imagens').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  async deleteProductImages(productId: string) {
+    const { data: images, error: imgErr } = await supabase.from('imagens').select('url').eq('produto_id', productId)
+    if(imgErr) throw imgErr
+    
+    const fileNames = images.map(i => i.url.split('/').pop()).filter(Boolean) as string[]
+    if(fileNames.length > 0) {
+      await supabase.storage.from('product-images').remove(fileNames)
+    }
+
+    const { error } = await supabase.from('imagens').delete().eq('produto_id', productId)
+    if (error) throw error
+  }
 }
 
 export const categoryService = {

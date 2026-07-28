@@ -7,6 +7,7 @@ import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
 import { Search, Eye } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Input'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { Event, EventStatus } from '@/types'
 
@@ -104,9 +105,11 @@ export default function AdminEvents() {
                       </Select>
                     </td>
                     <td className="px-4 py-3">
-                      <button className="text-white/40 hover:text-white transition-colors cursor-pointer">
-                        <Eye size={16} />
-                      </button>
+                      <Link to={`/admin/eventos/${event.id}`}>
+                        <button className="text-white/40 hover:text-white transition-colors cursor-pointer">
+                          <Eye size={16} />
+                        </button>
+                      </Link>
                     </td>
                   </motion.tr>
                 ))

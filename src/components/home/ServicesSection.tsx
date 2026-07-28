@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { productService } from '@/services/product.service'
 import { categoryService } from '@/services/product.service'
 import { CardSkeleton } from '@/components/ui/Badge'
@@ -20,11 +21,15 @@ export function ServicesSection() {
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: categoryService.getCategories,
+    enabled: !!isSupabaseConfigured,
+    retry: 0,
   })
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', activeCategory],
     queryFn: () => productService.getProducts(activeCategory ?? undefined),
+    enabled: !!isSupabaseConfigured,
+    retry: 0,
   })
 
   function handleAddToEvent() {

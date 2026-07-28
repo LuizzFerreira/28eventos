@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { PublicLayout } from '@/layouts/PublicLayout'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { AdminLayout } from '@/layouts/AdminLayout'
@@ -29,7 +29,7 @@ function PageLoader() {
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<PublicLayout />}>
@@ -51,12 +51,13 @@ export function AppRouter() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="eventos" element={<AdminEvents />} />
+            <Route path="eventos/:id" element={<EventPage />} />
             <Route path="produtos" element={<AdminProducts />} />
             <Route path="categorias" element={<AdminCategories />} />
             <Route path="clientes" element={<AdminClients />} />
           </Route>
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   )
 }

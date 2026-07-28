@@ -1,7 +1,21 @@
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import CountUp from 'react-countup'
 import { Trophy, Heart, Clock, Star } from 'lucide-react'
+
+function CountUp({ end, duration = 2.5 }: { end: number; duration?: number }) {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    let start = 0
+    const step = end / (duration * 60)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= end) { setCount(end); clearInterval(timer) }
+      else setCount(Math.floor(start))
+    }, 1000 / 60)
+    return () => clearInterval(timer)
+  }, [end, duration])
+  return <>{count}</>
+}
 
 const stats = [
   { icon: Trophy, value: 500, suffix: '+', label: 'Eventos Realizados', color: 'text-yellow-400' },

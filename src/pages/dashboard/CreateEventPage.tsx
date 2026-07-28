@@ -50,6 +50,9 @@ export default function CreateEventPage() {
   const [step, setStep] = useState(0)
   const [tipo, setTipo] = useState<EventType | null>(null)
   const [possuiAniversariante, setPossuiAniversariante] = useState(false)
+  const [nomeAniversariante, setNomeAniversariante] = useState('')
+  const [idadeAniversariante, setIdadeAniversariante] = useState('')
+  const [sexoAniversariante, setSexoAniversariante] = useState('')
   const [cart, setCart] = useState<{ produto: Product; quantidade: number }[]>([])
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [_eventId, setEventId] = useState<string | null>(null)
@@ -77,6 +80,9 @@ export default function CreateEventPage() {
         ...d2,
         ...d3,
         possui_aniversariante: possuiAniversariante,
+        nome_aniversariante: nomeAniversariante,
+        idade_aniversariante: Number(idadeAniversariante),
+        sexo_aniversariante: sexoAniversariante,
       } as Parameters<typeof eventService.createEvent>[1])
       setEventId(event.id)
 
@@ -273,10 +279,10 @@ export default function CreateEventPage() {
               </div>
               {possuiAniversariante && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                  <Input label="Nome do aniversariante" placeholder="Nome completo" />
+                  <Input label="Nome do aniversariante" placeholder="Nome completo" value={nomeAniversariante} onChange={e => setNomeAniversariante(e.target.value)} />
                   <div className="grid grid-cols-2 gap-4">
-                    <Input label="Idade" type="number" placeholder="Ex: 15" />
-                    <Select label="Sexo">
+                    <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
+                    <Select label="Sexo" value={sexoAniversariante} onChange={e => setSexoAniversariante(e.target.value)}>
                       <option value="">Selecione</option>
                       <option value="masculino">Masculino</option>
                       <option value="feminino">Feminino</option>
