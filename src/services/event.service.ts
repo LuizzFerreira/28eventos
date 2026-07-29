@@ -89,10 +89,18 @@ export const eventService = {
   async getAllEvents() {
     const { data, error } = await supabase
       .from('eventos')
-      .select('*, profiles(nome, email, avatar_url), evento_itens(*)')
+      .select('*, profiles(nome, email, avatar_url), evento_itens(*, produtos(nome, preco, categorias(nome)), evento_item_preferencias(respostas))')
       .order('created_at', { ascending: false })
     if (error) throw error
-    return data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data ?? []).map((e: any) => ({
+      ...e,
+      itens: (e.evento_itens ?? []).map((i: any) => ({
+        ...i,
+        produto: i.produtos ? { ...i.produtos, categoria: i.produtos.categorias ?? null } : null,
+        preferencias: i.evento_item_preferencias?.respostas ?? null,
+      })),
+    }))
   },
 
   async updateStatus(id: string, status: Event['status']) {

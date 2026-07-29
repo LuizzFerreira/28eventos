@@ -8,6 +8,7 @@ import { formatCurrency, formatDate } from '@/utils/cn'
 import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { toast } from 'sonner'
+import { AdminPreferenceView } from '@/components/admin/AdminPreferenceView'
 import type { Event, EventStatus } from '@/types'
 
 type AdminEvent = Event & { profiles?: { nome?: string; email?: string; avatar_url?: string } }
@@ -143,16 +144,28 @@ export default function AdminEvents() {
                 {event.itens && event.itens.length > 0 && (
                   <div>
                     <p className="text-white/40 text-xs mb-2">Serviços solicitados</p>
-                    <div className="space-y-1.5">
-                      {event.itens.map(item => (
-                        <div key={item.id} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2 text-sm">
-                          <span className="text-white/80">{item.produto?.nome}</span>
-                          <div className="flex items-center gap-4">
-                            <span className="text-white/40">x{item.quantidade}</span>
-                            <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                    <div className="space-y-2">
+                      {event.itens.map(item => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const pref = (item as any).preferencias as Record<string, unknown> | null
+                        const catNome = item.produto?.categoria?.nome ?? ''
+                        return (
+                          <div key={item.id} className="bg-white/5 rounded-xl px-3 py-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-white/80">{item.produto?.nome}</span>
+                              <div className="flex items-center gap-4">
+                                <span className="text-white/40">x{item.quantidade}</span>
+                                <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                              </div>
+                            </div>
+                            <AdminPreferenceView
+                              itemNome={item.produto?.nome ?? ''}
+                              categoriaNome={catNome}
+                              preferencias={pref}
+                            />
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                       <div className="flex justify-between px-3 py-2 text-sm font-bold">
                         <span className="text-white">Total estimado</span>
                         <span className="text-[#c9a84c] text-base">{formatCurrency(event.valor_total)}</span>
