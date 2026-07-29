@@ -99,7 +99,7 @@ create table public.eventos (
   sexo_aniversariante text,
   observacoes text,
   valor_total decimal(10,2) default 0,
-  status text default 'em_criacao' check (status in ('em_criacao','orcamento','em_analise','confirmado','finalizado')),
+  status text default 'em_criacao' check (status in ('em_criacao','orcamento','em_analise','confirmado','finalizado','cancelado')),
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );

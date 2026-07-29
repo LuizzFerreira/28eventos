@@ -4,6 +4,7 @@ export type EventStatus =
   | 'em_analise'
   | 'confirmado'
   | 'finalizado'
+  | 'cancelado'
 
 export type EventType =
   | 'casamento'

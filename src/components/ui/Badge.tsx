@@ -29,10 +29,11 @@ export function Badge({ children, variant = 'gray', className }: BadgeProps) {
 
 export const statusBadge = {
   em_criacao: { label: 'Em Criação', variant: 'gray' as const },
-  orcamento: { label: 'Orçamento', variant: 'blue' as const },
+  orcamento:  { label: 'Orçamento', variant: 'blue' as const },
   em_analise: { label: 'Em Análise', variant: 'purple' as const },
   confirmado: { label: 'Confirmado', variant: 'green' as const },
   finalizado: { label: 'Finalizado', variant: 'gold' as const },
+  cancelado:  { label: 'Cancelado', variant: 'red' as const },
 }
 
 interface SkeletonProps { className?: string }

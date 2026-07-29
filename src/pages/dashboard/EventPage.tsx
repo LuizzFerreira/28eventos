@@ -7,8 +7,9 @@ import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
 import { Link } from 'react-router-dom'
-import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock } from 'lucide-react'
+import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock, XCircle } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/Input'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
@@ -56,6 +57,14 @@ export default function EventPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['checklist'] }),
   })
 
+  const cancelEvent = useMutation({
+    mutationFn: () => eventService.updateStatus(event!.id, 'cancelado'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-events'] })
+      toast.success('Evento cancelado.')
+    },
+  })
+
   if (isLoading) return <Skeleton className="h-96 w-full" />
 
   if (!event) return (
@@ -79,7 +88,17 @@ export default function EventPage() {
             </span>
             <h1 className="text-3xl font-black text-white mt-1">{event.nome_evento}</h1>
           </div>
-          <Badge variant={statusBadge[event.status].variant}>{statusBadge[event.status].label}</Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant={statusBadge[event.status].variant}>{statusBadge[event.status].label}</Badge>
+            {event.status !== 'cancelado' && event.status !== 'finalizado' && (
+              <button
+                onClick={() => { if (confirm('Tem certeza que deseja cancelar este evento?')) cancelEvent.mutate() }}
+                className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 glass px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                <XCircle size={13} /> Cancelar evento
+              </button>
+            )}
+          </div>
         </div>
       </motion.div>
 
