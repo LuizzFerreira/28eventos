@@ -9,7 +9,18 @@ interface Props {
 
 export function AdminPreferenceView({ itemNome, categoriaNome, preferencias }: Props) {
   const config = getConfigForCategory(categoriaNome)
-  if (!config || !preferencias || Object.keys(preferencias).length === 0) return null
+
+  // Sem config para essa categoria
+  if (!config) return null
+
+  // Sem preferências preenchidas ainda
+  if (!preferencias || Object.keys(preferencias).length === 0) {
+    return (
+      <div className="mt-2 px-1">
+        <span className="text-white/20 text-xs italic">Preferências ainda não preenchidas pelo cliente</span>
+      </div>
+    )
+  }
 
   // Calcula resumo inteligente (bartender etc)
   const summaryLines: string[] = []

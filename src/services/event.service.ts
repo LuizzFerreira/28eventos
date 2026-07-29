@@ -98,7 +98,9 @@ export const eventService = {
       itens: (e.evento_itens ?? []).map((i: any) => ({
         ...i,
         produto: i.produtos ? { ...i.produtos, categoria: i.produtos.categorias ?? null } : null,
-        preferencias: i.evento_item_preferencias?.respostas ?? null,
+        preferencias: Array.isArray(i.evento_item_preferencias)
+          ? (i.evento_item_preferencias[0]?.respostas ?? null)
+          : (i.evento_item_preferencias?.respostas ?? null),
       })),
     }))
   },
