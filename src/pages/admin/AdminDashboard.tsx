@@ -11,15 +11,19 @@ import {
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
 export default function AdminDashboard() {
   const { data: events, isLoading } = useQuery({
     queryKey: ['admin-events'],
     queryFn: eventService.getAllEvents,
+    enabled: !DEV_BYPASS,
   })
 
   const { data: profiles } = useQuery({
     queryKey: ['admin-profiles'],
     queryFn: profileService.getAllProfiles,
+    enabled: !DEV_BYPASS,
   })
 
   const totalRevenue = events?.reduce((acc: number, e: { valor_total?: number }) => acc + (e.valor_total || 0), 0) || 0

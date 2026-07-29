@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { eventService } from '@/services/event.service'
 import { Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
+import { formatCurrency, formatDate } from '@/utils/cn'
 import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { toast } from 'sonner'
@@ -20,6 +20,8 @@ const statusLabel: Record<EventStatus, { label: string; color: string }> = {
   finalizado: { label: 'Finalizado', color: 'text-[#c9a84c] bg-[#c9a84c]/20' },
 }
 
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
 export default function AdminEvents() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -28,6 +30,7 @@ export default function AdminEvents() {
   const { data: events, isLoading } = useQuery({
     queryKey: ['admin-events'],
     queryFn: eventService.getAllEvents,
+    enabled: !DEV_BYPASS,
   })
 
   const updateStatus = useMutation({

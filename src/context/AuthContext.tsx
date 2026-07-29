@@ -19,12 +19,12 @@ const AuthContext = createContext<AuthContextType | null>(null)
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
 const DEV_USER = {
-  id: 'dev-user-id',
+  id: '',
   email: 'dev@28eventos.com',
 } as User
 
 const DEV_PROFILE: UserProfile = {
-  id: 'dev-user-id',
+  id: '',
   email: 'dev@28eventos.com',
   nome: 'Dev User',
   role: 'admin',

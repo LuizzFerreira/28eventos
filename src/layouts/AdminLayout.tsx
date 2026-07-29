@@ -21,7 +21,7 @@ const adminNav = [
 const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabela122006@gmail.com', 'dev@28eventos.com']
 
 export function AdminLayout() {
-  const { user, profile, signOut, loading } = useAuth()
+  const { user, signOut, loading } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
 
