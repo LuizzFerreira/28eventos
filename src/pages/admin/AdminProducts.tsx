@@ -75,6 +75,8 @@ export default function AdminProducts() {
       toast.success(ativo ? 'Produto visível!' : 'Produto ocultado!')
     },
   })
+
+  function openEdit(product: Product) {
     setEditing(product)
     setValue('nome', product.nome)
     setValue('descricao', product.descricao || '')
