@@ -18,6 +18,8 @@ const adminNav = [
   { icon: BarChart2, label: 'Financeiro', href: '/admin/financeiro' },
 ]
 
+const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabela122006@gmail.com', 'dev@28eventos.com']
+
 export function AdminLayout() {
   const { user, profile, signOut, loading } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -29,7 +31,7 @@ export function AdminLayout() {
     </div>
   )
 
-  if (!user || profile?.role !== 'admin') return <Navigate to="/" replace />
+  if (!user || !ADMIN_EMAILS.includes(user.email ?? '')) return <Navigate to="/" replace />
 
   return (
     <div className="min-h-screen flex bg-[#0a0a0a]">

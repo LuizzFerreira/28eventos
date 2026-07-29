@@ -16,13 +16,30 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
+const DEV_USER = {
+  id: 'dev-user-id',
+  email: 'dev@28eventos.com',
+} as User
+
+const DEV_PROFILE: UserProfile = {
+  id: 'dev-user-id',
+  email: 'dev@28eventos.com',
+  nome: 'Dev User',
+  role: 'admin',
+  created_at: new Date().toISOString(),
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(DEV_BYPASS ? DEV_USER : null)
   const [session, setSession] = useState<Session | null>(null)
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [profile, setProfile] = useState<UserProfile | null>(DEV_BYPASS ? DEV_PROFILE : null)
+  const [loading, setLoading] = useState(!DEV_BYPASS)
 
   useEffect(() => {
+    if (DEV_BYPASS) return
+
     authService.getSession().then(({ data }) => {
       setSession(data.session)
       setUser(data.session?.user ?? null)

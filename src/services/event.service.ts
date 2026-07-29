@@ -1,6 +1,17 @@
 import { supabase } from '@/lib/supabase'
 import type { Event, EventFormData, EventItem } from '@/types'
 
+export async function sendQuoteEmail(event: Event, clientName: string, clientEmail: string) {
+  const items = (event.itens ?? []).map(i => ({
+    nome: i.produto?.nome ?? '',
+    quantidade: i.quantidade,
+    subtotal: i.subtotal,
+  }))
+  await supabase.functions.invoke('send-quote-email', {
+    body: { event, items, clientName, clientEmail },
+  })
+}
+
 export const eventService = {
   async getMyEvents(userId: string) {
     const { data, error } = await supabase
@@ -81,5 +92,15 @@ export const eventService = {
       .update({ status, updated_at: new Date().toISOString() })
       .eq('id', id)
     if (error) throw error
+  },
+
+  async getEventWithItems(id: string) {
+    const { data, error } = await supabase
+      .from('eventos')
+      .select('*, evento_itens(*, produtos(nome, preco))')
+      .eq('id', id)
+      .single()
+    if (error) throw error
+    return data as Event
   },
 }

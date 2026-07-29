@@ -6,7 +6,9 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
-import { Plus, Calendar, DollarSign, Users, Clock, ArrowRight } from 'lucide-react'
+import { Plus, Calendar, DollarSign, Users, Clock, ArrowRight, Check } from 'lucide-react'
+
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
 export default function DashboardPage() {
   const { profile } = useAuth()
@@ -14,7 +16,7 @@ export default function DashboardPage() {
   const { data: events, isLoading } = useQuery({
     queryKey: ['my-events', profile?.id],
     queryFn: () => eventService.getMyEvents(profile!.id),
-    enabled: !!profile?.id,
+    enabled: !!profile?.id && !DEV_BYPASS,
   })
 
   const latestEvent = events?.[0]
@@ -77,6 +79,20 @@ export default function DashboardPage() {
               <div className="text-white/40 text-xs">Valor estimado</div>
             </div>
           </div>
+
+          {latestEvent.status === 'orcamento' && (
+            <div className="mt-4 flex items-center gap-3 bg-blue-500/10 border border-blue-500/20 rounded-xl px-4 py-3">
+              <Clock size={16} className="text-blue-400 flex-shrink-0" />
+              <p className="text-blue-300 text-sm">Seu orçamento foi enviado! Nossa equipe entrará em contato em até 24h para confirmar.</p>
+            </div>
+          )}
+
+          {latestEvent.status === 'confirmado' && (
+            <div className="mt-4 flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
+              <Check size={16} className="text-green-400 flex-shrink-0" />
+              <p className="text-green-300 text-sm font-medium">Seu evento foi confirmado! Em breve entraremos em contato com os próximos passos.</p>
+            </div>
+          )}
 
           {latestEvent.itens && latestEvent.itens.length > 0 && (
             <div className="mt-4 pt-4 border-t border-white/10">

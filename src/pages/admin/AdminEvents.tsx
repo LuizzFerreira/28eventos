@@ -1,28 +1,28 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { eventService } from '@/services/event.service'
 import { Skeleton } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
-import { Search, Eye } from 'lucide-react'
+import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Input'
-import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { Event, EventStatus } from '@/types'
 
-const statusOptions: { value: EventStatus | ''; label: string }[] = [
-  { value: '', label: 'Todos os status' },
-  { value: 'em_criacao', label: 'Em Criação' },
-  { value: 'orcamento', label: 'Orçamento' },
-  { value: 'em_analise', label: 'Em Análise' },
-  { value: 'confirmado', label: 'Confirmado' },
-  { value: 'finalizado', label: 'Finalizado' },
-]
+type AdminEvent = Event & { profiles?: { nome?: string; email?: string; avatar_url?: string } }
+
+const statusLabel: Record<EventStatus, { label: string; color: string }> = {
+  em_criacao: { label: 'Em Criação', color: 'text-white/40 bg-white/10' },
+  orcamento:  { label: 'Aguardando', color: 'text-blue-400 bg-blue-500/20' },
+  em_analise: { label: 'Em Análise', color: 'text-purple-400 bg-purple-500/20' },
+  confirmado: { label: 'Confirmado', color: 'text-green-400 bg-green-500/20' },
+  finalizado: { label: 'Finalizado', color: 'text-[#c9a84c] bg-[#c9a84c]/20' },
+}
 
 export default function AdminEvents() {
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState<EventStatus | ''>('')
+  const [expanded, setExpanded] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   const { data: events, isLoading } = useQuery({
@@ -33,94 +33,194 @@ export default function AdminEvents() {
   const updateStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: EventStatus }) =>
       eventService.updateStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] })
-      toast.success('Status atualizado!')
+      toast.success(status === 'confirmado' ? 'Evento confirmado!' : 'Evento rejeitado.')
     },
   })
 
-  const filtered = events?.filter((e: Event & { profiles?: { nome?: string } }) => {
-    const matchSearch = !search ||
-      e.nome_evento.toLowerCase().includes(search.toLowerCase()) ||
-      e.profiles?.nome?.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || e.status === statusFilter
-    return matchSearch && matchStatus
+  const filtered = (events as AdminEvent[] | undefined)?.filter(e => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      e.nome_evento.toLowerCase().includes(q) ||
+      e.profiles?.nome?.toLowerCase().includes(q) ||
+      e.profiles?.email?.toLowerCase().includes(q)
+    )
   })
+
+  const pending = filtered?.filter(e => e.status === 'orcamento' || e.status === 'em_analise') ?? []
+  const others  = filtered?.filter(e => e.status !== 'orcamento' && e.status !== 'em_analise') ?? []
+
+  function toggle(id: string) {
+    setExpanded(prev => prev === id ? null : id)
+  }
+
+  function EventCard({ event }: { event: AdminEvent }) {
+    const open = expanded === event.id
+    const s = statusLabel[event.status]
+
+    return (
+      <motion.div
+        layout
+        className={`glass rounded-2xl overflow-hidden transition-all ${event.status === 'orcamento' ? 'border border-blue-500/20' : ''}`}
+      >
+        {/* Header */}
+        <button
+          onClick={() => toggle(event.id)}
+          className="w-full flex items-center gap-4 p-5 text-left cursor-pointer hover:bg-white/3 transition-colors"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
+              <span className="text-white/30 text-xs">{event.data ? formatDate(event.data) : '—'}</span>
+            </div>
+            <p className="text-white font-bold mt-1 truncate">{event.nome_evento}</p>
+            <p className="text-white/50 text-sm">{event.profiles?.nome} · {event.profiles?.email}</p>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <p className="text-[#c9a84c] font-bold">{formatCurrency(event.valor_total)}</p>
+            <p className="text-white/30 text-xs">{(event as Event & { evento_itens?: unknown[] }).evento_itens?.length ?? 0} serviços</p>
+          </div>
+          {open ? <ChevronUp size={16} className="text-white/40 flex-shrink-0" /> : <ChevronDown size={16} className="text-white/40 flex-shrink-0" />}
+        </button>
+
+        {/* Details */}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="px-5 pb-5 space-y-5 border-t border-white/5 pt-4">
+                {/* Info grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { icon: Calendar, label: 'Data', value: event.data ? formatDate(event.data) : '—' },
+                    { icon: Clock, label: 'Horário', value: event.horario_inicio ? `${event.horario_inicio} - ${event.horario_fim}` : '—' },
+                    { icon: Users, label: 'Pessoas', value: String(event.quantidade_pessoas) },
+                    { icon: MapPin, label: 'Local', value: `${event.cidade}, ${event.estado}` },
+                  ].map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="bg-white/5 rounded-xl p-3">
+                      <Icon size={13} className="text-[#c9a84c] mb-1" />
+                      <p className="text-white/40 text-xs">{label}</p>
+                      <p className="text-white text-sm font-medium">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Address */}
+                <div className="bg-white/5 rounded-xl p-3 text-sm text-white/70">
+                  <span className="text-white/40 text-xs block mb-1">Endereço completo</span>
+                  {event.endereco}, {event.numero}{event.complemento ? ` - ${event.complemento}` : ''} · {event.bairro} · CEP {event.cep}
+                </div>
+
+                {/* Aniversariante */}
+                {event.possui_aniversariante && (
+                  <div className="bg-white/5 rounded-xl p-3 text-sm">
+                    <span className="text-white/40 text-xs block mb-1">Aniversariante</span>
+                    <span className="text-white">{event.nome_aniversariante}</span>
+                    <span className="text-white/50"> · {event.idade_aniversariante} anos · {event.sexo_aniversariante}</span>
+                  </div>
+                )}
+
+                {/* Observações */}
+                {event.observacoes && (
+                  <div className="bg-white/5 rounded-xl p-3 text-sm">
+                    <span className="text-white/40 text-xs block mb-1">Observações</span>
+                    <span className="text-white/80">{event.observacoes}</span>
+                  </div>
+                )}
+
+                {/* Serviços */}
+                {event.itens && event.itens.length > 0 && (
+                  <div>
+                    <p className="text-white/40 text-xs mb-2">Serviços solicitados</p>
+                    <div className="space-y-1.5">
+                      {event.itens.map(item => (
+                        <div key={item.id} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2 text-sm">
+                          <span className="text-white/80">{item.produto?.nome}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-white/40">x{item.quantidade}</span>
+                            <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-between px-3 py-2 text-sm font-bold">
+                        <span className="text-white">Total estimado</span>
+                        <span className="text-[#c9a84c] text-base">{formatCurrency(event.valor_total)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                {(event.status === 'orcamento' || event.status === 'em_analise') && (
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      className="flex-1 bg-green-600 hover:bg-green-500"
+                      loading={updateStatus.isPending}
+                      onClick={() => updateStatus.mutate({ id: event.id, status: 'confirmado' })}
+                    >
+                      <Check size={15} /> Confirmar evento
+                    </Button>
+                    <button
+                      onClick={() => updateStatus.mutate({ id: event.id, status: 'em_criacao' })}
+                      disabled={updateStatus.isPending}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50"
+                    >
+                      <X size={15} /> Rejeitar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-black text-white">Eventos</h1>
-        <p className="text-white/50 mt-1">{events?.length || 0} eventos no total</p>
+        <h1 className="text-3xl font-black text-white">Orçamentos</h1>
+        <p className="text-white/50 mt-1">{pending.length} aguardando confirmação</p>
       </motion.div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
-          <Input placeholder="Buscar evento ou cliente..." value={search} onChange={e => setSearch(e.target.value)} icon={<Search size={16} />} />
-        </div>
-        <div className="sm:w-52">
-          <Select value={statusFilter} onChange={e => setStatusFilter(e.target.value as EventStatus | '')}>
-            {statusOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </Select>
-        </div>
-      </div>
+      <Input
+        placeholder="Buscar por evento ou cliente..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        icon={<Search size={16} />}
+      />
 
-      <div className="glass rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/5">
-                {['Evento', 'Cliente', 'Data', 'Pessoas', 'Valor', 'Status', 'Ações'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-white/40 text-xs font-medium uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading
-                ? [...Array(6)].map((_, i) => (
-                  <tr key={i}><td colSpan={7} className="px-4 py-3"><Skeleton className="h-8 w-full" /></td></tr>
-                ))
-                : filtered?.map((event: Event & { profiles?: { nome?: string } }) => (
-                  <motion.tr
-                    key={event.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="border-b border-white/5 hover:bg-white/3 transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <p className="text-white font-medium text-sm">{event.nome_evento}</p>
-                      <p className="text-white/40 text-xs">{eventTypeLabels[event.tipo_evento]}</p>
-                    </td>
-                    <td className="px-4 py-3 text-white/70 text-sm">{event.profiles?.nome || '—'}</td>
-                    <td className="px-4 py-3 text-white/70 text-sm">{event.data ? formatDate(event.data) : '—'}</td>
-                    <td className="px-4 py-3 text-white/70 text-sm">{event.quantidade_pessoas}</td>
-                    <td className="px-4 py-3 text-[#c9a84c] font-semibold text-sm">{formatCurrency(event.valor_total)}</td>
-                    <td className="px-4 py-3">
-                      <Select
-                        value={event.status}
-                        onChange={e => updateStatus.mutate({ id: event.id, status: e.target.value as EventStatus })}
-                        className="text-xs py-1.5 px-2"
-                      >
-                        {statusOptions.slice(1).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                      </Select>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Link to={`/admin/eventos/${event.id}`}>
-                        <button className="text-white/40 hover:text-white transition-colors cursor-pointer">
-                          <Eye size={16} />
-                        </button>
-                      </Link>
-                    </td>
-                  </motion.tr>
-                ))
-              }
-            </tbody>
-          </table>
-        </div>
-        {!isLoading && filtered?.length === 0 && (
-          <div className="text-center py-12 text-white/40">Nenhum evento encontrado.</div>
-        )}
-      </div>
+      {isLoading ? (
+        <div className="space-y-3">{[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}</div>
+      ) : (
+        <>
+          {pending.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-widest">Aguardando confirmação</p>
+              {pending.map(e => <EventCard key={e.id} event={e} />)}
+            </div>
+          )}
+
+          {others.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mt-6">Histórico</p>
+              {others.map(e => <EventCard key={e.id} event={e} />)}
+            </div>
+          )}
+
+          {filtered?.length === 0 && (
+            <div className="text-center py-16 text-white/40">Nenhum evento encontrado.</div>
+          )}
+        </>
+      )}
     </div>
   )
 }

@@ -11,6 +11,8 @@ import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock } from 'lucide-reac
 import { useState } from 'react'
 import { Input } from '@/components/ui/Input'
 
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
 export default function EventPage() {
   const { profile } = useAuth()
   const queryClient = useQueryClient()
@@ -19,7 +21,7 @@ export default function EventPage() {
   const { data: events, isLoading } = useQuery({
     queryKey: ['my-events', profile?.id],
     queryFn: () => eventService.getMyEvents(profile!.id),
-    enabled: !!profile?.id,
+    enabled: !!profile?.id && !DEV_BYPASS,
   })
 
   const event = events?.[0]

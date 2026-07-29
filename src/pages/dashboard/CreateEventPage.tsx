@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAuth } from '@/context/AuthContext'
-import { eventService } from '@/services/event.service'
+import { eventService, sendQuoteEmail } from '@/services/event.service'
 import { productService } from '@/services/product.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom'
 import { Check, ChevronRight, Minus, Plus, ShoppingCart } from 'lucide-react'
 import { ProductSearch } from '@/components/ui/ProductSearch'
 import type { EventType, Product } from '@/types'
+
+const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
 const steps = ['Tipo', 'Dados', 'Local', 'Aniversariante', 'Serviços']
 
@@ -71,6 +73,11 @@ export default function CreateEventPage() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
+      if (DEV_BYPASS) {
+        await new Promise(r => setTimeout(r, 800))
+        return
+      }
+
       const d2 = form2.getValues()
       const d3 = form3.getValues()
       const event = await eventService.createEvent(profile!.id, {
@@ -96,6 +103,10 @@ export default function CreateEventPage() {
 
       const total = cart.reduce((acc, i) => acc + i.produto.preco * i.quantidade, 0)
       await eventService.updateEvent(event.id, { valor_total: total, status: 'orcamento' })
+
+      const fullEvent = await eventService.getEventWithItems(event.id)
+      await sendQuoteEmail(fullEvent, profile!.nome ?? '', profile!.email).catch(() => {})
+
       return event
     },
     onSuccess: () => {
