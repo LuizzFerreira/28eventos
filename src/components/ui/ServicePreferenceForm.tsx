@@ -14,6 +14,7 @@ interface Props {
 
 export function ServicePreferenceForm({ item }: Props) {
   const categoryName = item.produto?.categoria?.nome ?? ''
+  console.log('[ServicePreferenceForm] item:', item.produto?.nome, '| categoria:', categoryName)
   const config = getConfigForCategory(categoryName)
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
