@@ -20,13 +20,16 @@ export const eventService = {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
     if (error) throw error
-    return (data ?? []).map(e => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (data ?? []).map((e: any) => ({
       ...e,
-      itens: (e.evento_itens ?? []).map((i: Record<string, unknown>) => ({
+      itens: (e.evento_itens ?? []).map((i: any) => ({
         ...i,
-        produto: i.produtos ? { ...(i.produtos as Record<string, unknown>), categoria: (i.produtos as Record<string, unknown>).categorias } : null,
+        produto: i.produtos
+          ? { ...i.produtos, categoria: i.produtos.categorias ?? null }
+          : null,
       })),
-    })) as unknown as Event[]
+    })) as Event[]
   },
 
   async getEvent(id: string) {
