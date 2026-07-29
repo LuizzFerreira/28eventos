@@ -18,6 +18,7 @@ const statusLabel: Record<EventStatus, { label: string; color: string }> = {
   em_analise: { label: 'Em Análise', color: 'text-purple-400 bg-purple-500/20' },
   confirmado: { label: 'Confirmado', color: 'text-green-400 bg-green-500/20' },
   finalizado: { label: 'Finalizado', color: 'text-[#c9a84c] bg-[#c9a84c]/20' },
+  cancelado:  { label: 'Cancelado', color: 'text-red-400 bg-red-500/20' },
 }
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
