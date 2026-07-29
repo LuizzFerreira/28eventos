@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
-import { Plus, Calendar, DollarSign, Users, Clock, ArrowRight, Check } from 'lucide-react'
+import { Plus, Calendar, DollarSign, Users, Clock, ArrowRight, Check, XCircle } from 'lucide-react'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
@@ -91,6 +91,13 @@ export default function DashboardPage() {
             <div className="mt-4 flex items-center gap-3 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
               <Check size={16} className="text-green-400 flex-shrink-0" />
               <p className="text-green-300 text-sm font-medium">Seu evento foi confirmado! Em breve entraremos em contato com os próximos passos.</p>
+            </div>
+          )}
+
+          {latestEvent.status === 'cancelado' && (
+            <div className="mt-4 flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+              <XCircle size={16} className="text-red-400 flex-shrink-0" />
+              <p className="text-red-300 text-sm font-medium">Este evento foi cancelado. Entre em contato conosco para mais informações.</p>
             </div>
           )}
 

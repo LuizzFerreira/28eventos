@@ -193,6 +193,18 @@ export default function AdminEvents() {
                     </button>
                   </div>
                 )}
+
+                {event.status === 'confirmado' && (
+                  <div className="pt-2">
+                    <button
+                      onClick={() => { if (confirm('Tem certeza que deseja cancelar este evento?')) updateStatus.mutate({ id: event.id, status: 'cancelado' }) }}
+                      disabled={updateStatus.isPending}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50"
+                    >
+                      <X size={15} /> Cancelar evento
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
