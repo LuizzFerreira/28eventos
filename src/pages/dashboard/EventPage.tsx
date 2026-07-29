@@ -7,10 +7,11 @@ import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
 import { Link } from 'react-router-dom'
-import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock, XCircle } from 'lucide-react'
+import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock, XCircle, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/Input'
+import { ServicePreferenceForm } from '@/components/ui/ServicePreferenceForm'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
@@ -148,6 +149,22 @@ export default function EventPage() {
           </div>
         )}
       </div>
+
+      {/* Personalize seus serviços — só aparece quando confirmado */}
+      {event.status === 'confirmado' && event.itens && event.itens.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles size={18} className="text-[#c9a84c]" />
+            <h2 className="text-white font-bold">Personalize seus serviços</h2>
+          </div>
+          <p className="text-white/40 text-sm mb-5">Seu evento foi confirmado! Agora preencha as preferências de cada serviço para que tudo saia perfeito.</p>
+          <div className="space-y-3">
+            {event.itens.map(item => (
+              <ServicePreferenceForm key={item.id} item={item} />
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Checklist */}
       <div className="glass rounded-2xl p-6">

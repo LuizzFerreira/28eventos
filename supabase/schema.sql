@@ -200,6 +200,26 @@ create policy "Users can manage own checklist" on public.checklist for all using
   exists (select 1 from public.eventos where id = evento_id and user_id = auth.uid())
 );
 
+-- SERVICE PREFERENCES
+create table public.evento_item_preferencias (
+  id uuid default uuid_generate_v4() primary key,
+  evento_item_id uuid references public.evento_itens(id) on delete cascade not null unique,
+  respostas jsonb not null default '{}',
+  updated_at timestamptz default now()
+);
+
+alter table public.evento_item_preferencias enable row level security;
+create policy "Users can manage own preferences" on public.evento_item_preferencias for all using (
+  exists (
+    select 1 from public.evento_itens ei
+    join public.eventos e on e.id = ei.evento_id
+    where ei.id = evento_item_id and e.user_id = auth.uid()
+  )
+);
+create policy "Admins can view all preferences" on public.evento_item_preferencias for select using (
+  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+);
+
 -- FAVORITES
 create table public.favoritos (
   id uuid default uuid_generate_v4() primary key,

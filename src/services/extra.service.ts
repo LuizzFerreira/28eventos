@@ -133,6 +133,25 @@ export const checklistService = {
   },
 }
 
+export const preferenceService = {
+  async get(eventoItemId: string) {
+    const { data } = await supabase
+      .from('evento_item_preferencias')
+      .select('respostas')
+      .eq('evento_item_id', eventoItemId)
+      .single()
+    return (data?.respostas ?? {}) as Record<string, unknown>
+  },
+
+  async save(eventoItemId: string, respostas: Record<string, unknown>) {
+    const { error } = await supabase
+      .from('evento_item_preferencias')
+      .upsert({ evento_item_id: eventoItemId, respostas, updated_at: new Date().toISOString() },
+        { onConflict: 'evento_item_id' })
+    if (error) throw error
+  },
+}
+
 export const favoriteService = {
   async getFavorites(userId: string) {
     const { data, error } = await supabase
