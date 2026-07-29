@@ -2,9 +2,10 @@ import { supabase } from '@/lib/supabase'
 
 export const authService = {
   async signInWithGoogle() {
+    const base = window.location.href.split('#')[0]
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}${window.location.pathname}` },
+      options: { redirectTo: base },
     })
   },
 

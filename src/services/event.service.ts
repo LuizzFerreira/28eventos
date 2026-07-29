@@ -20,7 +20,13 @@ export const eventService = {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
     if (error) throw error
-    return data as Event[]
+    return (data ?? []).map(e => ({
+      ...e,
+      itens: (e.evento_itens ?? []).map((i: Record<string, unknown>) => ({
+        ...i,
+        produto: i.produtos ? { ...(i.produtos as Record<string, unknown>), categoria: (i.produtos as Record<string, unknown>).categorias } : null,
+      })),
+    })) as unknown as Event[]
   },
 
   async getEvent(id: string) {
