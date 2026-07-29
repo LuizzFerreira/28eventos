@@ -12,6 +12,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/Input'
 import { ServicePreferenceForm } from '@/components/ui/ServicePreferenceForm'
+import { ConfirmModal } from '@/components/ui/CancelConfirmModal'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
@@ -19,6 +20,7 @@ export default function EventPage() {
   const { profile } = useAuth()
   const queryClient = useQueryClient()
   const [newTask, setNewTask] = useState('')
+  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['my-events', profile?.id],
@@ -62,6 +64,7 @@ export default function EventPage() {
     mutationFn: () => eventService.updateStatus(event!.id, 'cancelado'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-events'] })
+      setShowCancelModal(false)
       toast.success('Evento cancelado.')
     },
   })
@@ -81,6 +84,15 @@ export default function EventPage() {
 
   return (
     <div className="space-y-8 max-w-4xl">
+      <ConfirmModal
+        open={showCancelModal}
+        title="Cancelar evento?"
+        description={`Tem certeza que deseja cancelar "${event.nome_evento}"? Esta ação não pode ser desfeita e o evento ficará marcado como cancelado.`}
+        confirmLabel="Sim, cancelar evento"
+        onConfirm={() => cancelEvent.mutate()}
+        onClose={() => setShowCancelModal(false)}
+        loading={cancelEvent.isPending}
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
@@ -93,7 +105,7 @@ export default function EventPage() {
             <Badge variant={statusBadge[event.status].variant}>{statusBadge[event.status].label}</Badge>
             {event.status !== 'cancelado' && event.status !== 'finalizado' && (
               <button
-                onClick={() => { if (confirm('Tem certeza que deseja cancelar este evento?')) cancelEvent.mutate() }}
+                onClick={() => setShowCancelModal(true)}
                 className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 glass px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
               >
                 <XCircle size={13} /> Cancelar evento

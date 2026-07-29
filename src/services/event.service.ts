@@ -113,6 +113,14 @@ export const eventService = {
     if (error) throw error
   },
 
+  async deleteEvent(id: string) {
+    const { error } = await supabase
+      .from('eventos')
+      .delete()
+      .eq('id', id)
+    if (error) throw error
+  },
+
   async getEventWithItems(id: string) {
     const { data, error } = await supabase
       .from('eventos')

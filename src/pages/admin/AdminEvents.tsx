@@ -5,10 +5,11 @@ import { eventService } from '@/services/event.service'
 import { Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate } from '@/utils/cn'
-import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search } from 'lucide-react'
+import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { toast } from 'sonner'
 import { AdminPreferenceView } from '@/components/admin/AdminPreferenceView'
+import { ConfirmModal } from '@/components/ui/CancelConfirmModal'
 import type { Event, EventStatus } from '@/types'
 
 type AdminEvent = Event & { profiles?: { nome?: string; email?: string; avatar_url?: string } }
@@ -27,6 +28,8 @@ const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 export default function AdminEvents() {
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<AdminEvent | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminEvent | null>(null)
   const queryClient = useQueryClient()
 
   const { data: events, isLoading } = useQuery({
@@ -40,7 +43,17 @@ export default function AdminEvents() {
       eventService.updateStatus(id, status),
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] })
-      toast.success(status === 'confirmado' ? 'Evento confirmado!' : 'Evento rejeitado.')
+      setCancelTarget(null)
+      toast.success(status === 'confirmado' ? 'Evento confirmado!' : status === 'cancelado' ? 'Evento cancelado.' : 'Evento rejeitado.')
+    },
+  })
+
+  const deleteEvent = useMutation({
+    mutationFn: (id: string) => eventService.deleteEvent(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] })
+      setDeleteTarget(null)
+      toast.success('Evento apagado permanentemente.')
     },
   })
 
@@ -197,11 +210,22 @@ export default function AdminEvents() {
                 {event.status === 'confirmado' && (
                   <div className="pt-2">
                     <button
-                      onClick={() => { if (confirm('Tem certeza que deseja cancelar este evento?')) updateStatus.mutate({ id: event.id, status: 'cancelado' }) }}
+                      onClick={() => setCancelTarget(event)}
                       disabled={updateStatus.isPending}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50"
                     >
                       <X size={15} /> Cancelar evento
+                    </button>
+                  </div>
+                )}
+
+                {event.status === 'cancelado' && (
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setDeleteTarget(event)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors text-sm font-medium cursor-pointer"
+                    >
+                      <Trash2 size={15} /> Apagar evento permanentemente
                     </button>
                   </div>
                 )}
@@ -250,6 +274,26 @@ export default function AdminEvents() {
           )}
         </>
       )}
+
+      <ConfirmModal
+        open={!!cancelTarget}
+        title="Cancelar evento?"
+        description={`Tem certeza que deseja cancelar "${cancelTarget?.nome_evento}"? O cliente será notificado e o evento ficará marcado como cancelado.`}
+        confirmLabel="Sim, cancelar evento"
+        onConfirm={() => cancelTarget && updateStatus.mutate({ id: cancelTarget.id, status: 'cancelado' })}
+        onClose={() => setCancelTarget(null)}
+        loading={updateStatus.isPending}
+      />
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Apagar evento permanentemente?"
+        description={`Isso vai deletar "${deleteTarget?.nome_evento}" e TODOS os dados relacionados (serviços, preferências, checklist, mensagens). Esta ação é irreversível.`}
+        confirmLabel="Apagar tudo"
+        onConfirm={() => deleteTarget && deleteEvent.mutate(deleteTarget.id)}
+        onClose={() => setDeleteTarget(null)}
+        loading={deleteEvent.isPending}
+      />
     </div>
   )
 }
