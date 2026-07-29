@@ -31,7 +31,7 @@ export function AdminPreferenceView({ itemNome, categoriaNome, preferencias }: P
     }
   }
 
-  function renderValue(key: string, value: unknown): string | null {
+  function renderValue(_key: string, value: unknown): string | null {
     if (value === undefined || value === null || value === '') return null
     if (Array.isArray(value)) return value.length ? value.join(', ') : null
     if (typeof value === 'object') {
