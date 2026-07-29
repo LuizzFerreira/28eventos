@@ -7,7 +7,7 @@ import { Input, Select, Textarea } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import { Skeleton } from '@/components/ui/Badge'
 import { formatCurrency } from '@/utils/cn'
-import { Plus, Pencil, Trash2, Search, Star } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, Star, EyeOff, Eye } from 'lucide-react'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import type { Product } from '@/types'
@@ -66,7 +66,15 @@ export default function AdminProducts() {
     },
   })
 
-  function openEdit(product: Product) {
+  const toggleAtivoMutation = useMutation({
+    mutationFn: ({ id, ativo }: { id: string; ativo: boolean }) =>
+      productService.updateProduct(id, { ativo }),
+    onSuccess: (_, { ativo }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      toast.success(ativo ? 'Produto visível!' : 'Produto ocultado!')
+    },
+  })
     setEditing(product)
     setValue('nome', product.nome)
     setValue('descricao', product.descricao || '')
@@ -151,6 +159,13 @@ export default function AdminProducts() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleAtivoMutation.mutate({ id: product.id, ativo: !product.ativo })}
+                          title={product.ativo ? 'Ocultar produto' : 'Mostrar produto'}
+                          className={`transition-colors cursor-pointer ${product.ativo ? 'text-white/40 hover:text-yellow-400' : 'text-yellow-400 hover:text-white/40'}`}
+                        >
+                          {product.ativo ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
                         <button onClick={() => openEdit(product)} className="text-white/40 hover:text-white transition-colors cursor-pointer">
                           <Pencil size={14} />
                         </button>

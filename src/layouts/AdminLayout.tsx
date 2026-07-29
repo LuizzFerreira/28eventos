@@ -40,10 +40,10 @@ export function AdminLayout() {
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300`}
       >
         <div className="p-6 border-b border-white/5">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <span className="text-xl font-black gold-text">28</span>
             <span className="text-white font-light tracking-widest text-sm">ADMIN</span>
-          </div>
+          </Link>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
