@@ -36,14 +36,14 @@ const step3Schema = z.object({
   estado: z.string().min(2, 'Estado obrigatório'),
 })
 
-const eventTypes: { value: EventType; label: string; emoji: string }[] = [
-  { value: 'casamento', label: 'Casamento', emoji: '💍' },
-  { value: '15_anos', label: '15 Anos', emoji: '👑' },
-  { value: 'formatura', label: 'Formatura', emoji: '🎓' },
-  { value: 'corporativo', label: 'Corporativo', emoji: '💼' },
-  { value: 'infantil', label: 'Infantil', emoji: '🎈' },
-  { value: 'aniversario', label: 'Aniversário', emoji: '🎂' },
-  { value: 'outro', label: 'Outro', emoji: '✨' },
+const eventTypes: { value: EventType; label: string }[] = [
+  { value: 'casamento', label: 'Casamento' },
+  { value: '15_anos', label: '15 Anos' },
+  { value: 'formatura', label: 'Formatura' },
+  { value: 'corporativo', label: 'Corporativo' },
+  { value: 'infantil', label: 'Infantil' },
+  { value: 'aniversario', label: 'Aniversário' },
+  { value: 'outro', label: 'Outro' },
 ]
 
 export default function CreateEventPage() {
@@ -195,7 +195,6 @@ export default function CreateEventPage() {
                       tipo === et.value ? 'border-[#c9a84c] glass-gold' : 'hover:border-white/20'
                     }`}
                   >
-                    <div className="text-4xl mb-3">{et.emoji}</div>
                     <div className="text-white font-medium text-sm">{et.label}</div>
                     {tipo === et.value && <Check size={16} className="text-[#c9a84c] mx-auto mt-2" />}
                   </motion.button>
@@ -271,7 +270,7 @@ export default function CreateEventPage() {
                       possuiAniversariante === v ? 'glass-gold text-[#c9a84c]' : 'text-white/60 hover:text-white'
                     }`}
                   >
-                    {v ? '🎂 Sim' : '❌ Não'}
+                    {v ? 'Sim' : 'Não'}
                   </button>
                 ))}
               </div>

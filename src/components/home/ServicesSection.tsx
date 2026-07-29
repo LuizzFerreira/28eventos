@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { isSupabaseConfigured } from '@/lib/supabase'
@@ -6,13 +6,14 @@ import { productService } from '@/services/product.service'
 import { CardSkeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency } from '@/utils/cn'
-import { Plus, Star, Eye } from 'lucide-react'
+import { Plus, Star, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { LoginModal } from '@/components/ui/LoginModal'
 import { useNavigate } from 'react-router-dom'
 import { ServiceDetailModal } from '@/components/ui/ServiceDetailModal'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination } from 'swiper/modules'
+import { Pagination, Navigation } from 'swiper/modules'
+import type { Swiper as SwiperType } from 'swiper'
 import type { Product } from '@/types'
 
 import 'swiper/css'
@@ -21,6 +22,8 @@ import 'swiper/css/pagination'
 export function ServicesSection() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [selected, setSelected] = useState<Product | null>(null)
+  const [hovered, setHovered] = useState(false)
+  const swiperRef = useRef<SwiperType | null>(null)
   const { user } = useAuth()
   const navigate = useNavigate()
 
@@ -41,7 +44,7 @@ export function ServicesSection() {
 
   return (
     <>
-      <section id="servicos" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto">
+      <section id="servicos" className="py-24 px-4 sm:px-6 max-w-7xl mx-auto" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -57,15 +60,32 @@ export function ServicesSection() {
           </p>
         </motion.div>
 
-        <div className="services-carousel">
+        <div className="relative">
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-10 w-10 h-10 glass rounded-full flex items-center justify-center text-white hover:text-[#c9a84c] transition-all duration-300 cursor-pointer ${
+              hovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'
+            }`}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-10 w-10 h-10 glass rounded-full flex items-center justify-center text-white hover:text-[#c9a84c] transition-all duration-300 cursor-pointer ${
+              hovered ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'
+            }`}
+          >
+            <ChevronRight size={20} />
+          </button>
           {isLoading
             ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">{[...Array(8)].map((_, i) => <CardSkeleton key={i} />)}</div>
             : (
               <Swiper
-                modules={[Pagination]}
+                modules={[Pagination, Navigation]}
                 spaceBetween={24}
                 slidesPerView={1}
                 pagination={{ clickable: true, dynamicBullets: true }}
+                onSwiper={swiper => { swiperRef.current = swiper }}
                 breakpoints={{
                   640: { slidesPerView: 2 },
                   1024: { slidesPerView: 3 },

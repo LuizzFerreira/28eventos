@@ -99,9 +99,6 @@ export function HeroSection() {
               <Play size={16} /> Ver serviços
             </Button>
           </motion.div>
-
-
-
         </div>
       </section>
 
