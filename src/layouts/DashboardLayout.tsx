@@ -3,8 +3,10 @@ import { Outlet, Link, useLocation, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, Calendar, Plus, Bell, MessageSquare,
-  Users, CheckSquare, Heart, LogOut, Menu, X, ChevronRight
+  Users, CheckSquare, Heart, LogOut, Menu, X, ChevronRight, Shield
 } from 'lucide-react'
+
+const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabela122006@gmail.com']
 import { useAuth } from '@/context/AuthContext'
 
 const navItems = [
@@ -22,6 +24,7 @@ export function DashboardLayout() {
   const { user, profile, signOut, loading } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const isAdmin = ADMIN_EMAILS.includes(user?.email ?? '')
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -65,6 +68,16 @@ export function DashboardLayout() {
               </Link>
             )
           })}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#c9a84c]/70 hover:text-[#c9a84c] hover:bg-[#c9a84c]/5 transition-all duration-200"
+            >
+              <Shield size={17} />
+              Painel Admin
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-white/5">
