@@ -18,7 +18,7 @@ const adminNav = [
   { icon: BarChart2, label: 'Financeiro', href: '/admin/financeiro' },
 ]
 
-const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabela122006@gmail.com', 'dev@28eventos.com']
+const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabelavsc06@gmail.com', 'dev@28eventos.com']
 
 export function AdminLayout() {
   const { user, signOut, loading } = useAuth()

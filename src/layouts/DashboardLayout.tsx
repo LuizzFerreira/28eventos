@@ -6,7 +6,7 @@ import {
   Users, CheckSquare, Heart, LogOut, Menu, X, ChevronRight, Shield
 } from 'lucide-react'
 
-const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabela122006@gmail.com']
+const ADMIN_EMAILS = ['luizgferreira13@gmail.com', 'isabelavsc06@gmail.com']
 import { useAuth } from '@/context/AuthContext'
 
 const navItems = [
