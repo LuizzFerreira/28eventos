@@ -31,7 +31,7 @@ export function Navbar() {
     <>
       <motion.nav
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
-          scrolled ? 'glass border-b border-white/5 py-3' : 'py-5'
+          scrolled ? 'glass-solid py-3' : 'py-5'
         }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
