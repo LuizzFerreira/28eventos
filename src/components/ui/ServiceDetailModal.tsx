@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, Clock, Tag, Star, Plus, Heart, Play } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { formatCurrency } from '@/utils/cn'
 import type { Product } from '@/types'
 
 interface ServiceDetailModalProps {
@@ -149,12 +148,6 @@ export function ServiceDetailModal({ product, onClose, onAddToEvent, onFavorite 
 
               <div>
                 <p className="text-white/70 text-sm leading-relaxed">{product.descricao}</p>
-              </div>
-
-              <div className="glass rounded-xl p-4 mt-auto">
-                <span className="text-white/40 text-xs">A partir de</span>
-                <div className="text-3xl font-black text-[#c9a84c] mt-1">{formatCurrency(product.preco)}</div>
-                <p className="text-white/40 text-xs mt-1">Valor pode variar conforme detalhes do evento</p>
               </div>
 
               <div className="flex gap-3">

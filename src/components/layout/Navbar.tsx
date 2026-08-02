@@ -64,7 +64,7 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 glass rounded-xl px-3 py-2 hover:bg-white/10 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 glass border border-white/10 rounded-xl px-3 py-2 hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   <img
                     src={profile?.avatar_url || `https://ui-avatars.com/api/?name=${profile?.nome}&background=c9a84c&color=000`}
@@ -78,7 +78,7 @@ export function Navbar() {
                 <AnimatePresence>
                   {profileOpen && (
                     <motion.div
-                      className="absolute right-0 top-full mt-2 w-52 glass rounded-xl overflow-hidden shadow-2xl"
+                      className="absolute right-0 top-full mt-2 w-52 glass border border-white/10 rounded-xl overflow-hidden shadow-2xl"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -135,7 +135,7 @@ export function Navbar() {
         <AnimatePresence>
           {mobileOpen && (
             <motion.div
-              className="md:hidden glass border-t border-white/5 mt-3"
+              className="md:hidden glass-solid border-t border-white/10 mt-3"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}

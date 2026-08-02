@@ -77,6 +77,7 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
           { label: 'Rum' },
           { label: 'Tequila' },
           { label: 'Chopp' },
+          { label: 'Outros', suboptions: [] },
         ],
         summaryFn: (value, ctx) => {
           const bebedores = Number(ctx.bebedores) || 0
@@ -92,6 +93,8 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
           if (sel['Gin']?.length) linhas.push(`🍸 Gin: ~${Math.ceil(bebedores / 10)} garrafas`)
           if (sel['Rum']?.length) linhas.push(`🍹 Rum: ~${Math.ceil(bebedores / 10)} garrafas`)
           if (sel['Tequila']?.length) linhas.push(`🥃 Tequila: ~${Math.ceil(bebedores / 15)} garrafas`)
+          const outros = (ctx.bebidas_outros as string | undefined)?.trim()
+          if (outros) linhas.push(`🍹 Outros drinks: ${outros}`)
           return linhas.length ? linhas.join('\n') : null
         },
       },
@@ -173,6 +176,7 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
         key: 'sabor_bolo',
         label: 'Sabores do bolo',
         type: 'multiselect',
+        hint: 'O valor do pacote pode variar de acordo com os sabores escolhidos.',
         options: ['Chocolate', 'Baunilha', 'Morango', 'Limão', 'Red Velvet', 'Cenoura', 'Coco', 'Maracujá', 'Nozes', 'Prestígio'],
       },
       {

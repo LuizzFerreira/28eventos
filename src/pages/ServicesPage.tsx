@@ -7,7 +7,6 @@ import { CardSkeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { LoginModal } from '@/components/ui/LoginModal'
 import { ServiceDetailModal } from '@/components/ui/ServiceDetailModal'
-import { formatCurrency } from '@/utils/cn'
 import { useAuth } from '@/context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Star, Search, Eye } from 'lucide-react'
@@ -137,11 +136,7 @@ export default function ServicesPage() {
                   <h3 className="text-white font-semibold mt-1 mb-2">{product.nome}</h3>
                   <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-4">{product.descricao}</p>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-white/40 text-xs">A partir de</span>
-                      <div className="text-[#c9a84c] font-bold">{formatCurrency(product.preco)}</div>
-                    </div>
+                  <div className="flex items-center justify-end">
                     <Button size="sm" onClick={e => { e.stopPropagation(); handleAddToEvent() }}>
                       <Plus size={14} /> Adicionar
                     </Button>

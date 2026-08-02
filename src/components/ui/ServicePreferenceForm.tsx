@@ -14,7 +14,6 @@ interface Props {
 
 export function ServicePreferenceForm({ item }: Props) {
   const categoryName = item.produto?.categoria?.nome ?? ''
-  console.log('[ServicePreferenceForm] item:', item.produto?.nome, '| categoria:', categoryName)
   const config = getConfigForCategory(categoryName)
   const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
@@ -52,7 +51,6 @@ export function ServicePreferenceForm({ item }: Props) {
   function toggleNested(key: string, parent: string, sub?: string) {
     const current = (answers[key] as Record<string, string[]>) ?? {}
     if (!sub) {
-      // toggle parent — se já tem, remove tudo; se não tem, adiciona vazio
       if (current[parent] !== undefined) {
         const next = { ...current }
         delete next[parent]
@@ -69,7 +67,6 @@ export function ServicePreferenceForm({ item }: Props) {
     }
   }
 
-  // Calcula resumo inteligente
   const summaryLines: string[] = []
   for (const field of config.fields) {
     if (field.summaryFn && answers[field.key] !== undefined) {
@@ -116,7 +113,6 @@ export function ServicePreferenceForm({ item }: Props) {
                   <label className="text-white/70 text-sm font-medium block mb-2">{field.label}</label>
                   {field.hint && <p className="text-white/30 text-xs mb-2">{field.hint}</p>}
 
-                  {/* TEXT */}
                   {field.type === 'text' && (
                     <textarea
                       value={(answers[field.key] as string) ?? ''}
@@ -127,7 +123,6 @@ export function ServicePreferenceForm({ item }: Props) {
                     />
                   )}
 
-                  {/* NUMBER */}
                   {field.type === 'number' && (
                     <input
                       type="number"
@@ -138,7 +133,6 @@ export function ServicePreferenceForm({ item }: Props) {
                     />
                   )}
 
-                  {/* SELECT */}
                   {field.type === 'select' && (
                     <div className="flex flex-wrap gap-2">
                       {field.options?.map(opt => {
@@ -158,7 +152,6 @@ export function ServicePreferenceForm({ item }: Props) {
                     </div>
                   )}
 
-                  {/* MULTISELECT */}
                   {field.type === 'multiselect' && (
                     <div className="flex flex-wrap gap-2">
                       {field.options?.map(opt => {
@@ -178,7 +171,6 @@ export function ServicePreferenceForm({ item }: Props) {
                     </div>
                   )}
 
-                  {/* MULTISELECT NESTED */}
                   {field.type === 'multiselect_nested' && (
                     <div className="space-y-2">
                       {field.nestedOptions?.map(opt => {
@@ -194,7 +186,8 @@ export function ServicePreferenceForm({ item }: Props) {
                             >
                               {parentSelected && <Check size={10} className="inline mr-1" />}{opt.label}
                             </button>
-                            {parentSelected && opt.suboptions && (
+
+                            {parentSelected && opt.suboptions && opt.suboptions.length > 0 && (
                               <motion.div
                                 initial={{ opacity: 0, y: -4 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -216,6 +209,22 @@ export function ServicePreferenceForm({ item }: Props) {
                                 })}
                               </motion.div>
                             )}
+
+                            {parentSelected && opt.label === 'Outros' && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mt-2 ml-3"
+                              >
+                                <textarea
+                                  value={(answers[`${field.key}_outros`] as string) ?? ''}
+                                  onChange={e => setField(`${field.key}_outros`, e.target.value)}
+                                  placeholder="Ex: Mojito — rum, hortelã, limão, açúcar, água com gás"
+                                  rows={2}
+                                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#c9a84c]/50 resize-none"
+                                />
+                              </motion.div>
+                            )}
                           </div>
                         )
                       })}
@@ -224,12 +233,11 @@ export function ServicePreferenceForm({ item }: Props) {
                 </div>
               ))}
 
-              {/* Resumo inteligente */}
               {summaryLines.length > 0 && (
                 <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles size={14} className="text-[#c9a84c]" />
-                    <span className="text-[#c9a84c] text-xs font-semibold">Resumo de compras estimado</span>
+                    <span className="text-[#c9a84c] text-xs font-semibold">Lista de compras estimada</span>
                   </div>
                   {summaryLines.map((line, i) => (
                     <p key={i} className="text-white/70 text-xs leading-relaxed">{line}</p>

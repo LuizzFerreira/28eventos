@@ -5,7 +5,6 @@ import { isSupabaseConfigured } from '@/lib/supabase'
 import { productService } from '@/services/product.service'
 import { CardSkeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { formatCurrency } from '@/utils/cn'
 import { Plus, Star, Eye, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { LoginModal } from '@/components/ui/LoginModal'
@@ -127,11 +126,7 @@ export function ServicesSection() {
                         <h3 className="text-white font-semibold mt-1 mb-2">{product.nome}</h3>
                         <p className="text-white/50 text-xs leading-relaxed line-clamp-2 mb-4">{product.descricao}</p>
 
-                        <div className="flex items-center justify-between mt-auto">
-                          <div>
-                            <span className="text-white/40 text-xs">A partir de</span>
-                            <div className="text-[#c9a84c] font-bold">{formatCurrency(product.preco)}</div>
-                          </div>
+                        <div className="flex items-center justify-end mt-auto">
                           <Button size="sm" onClick={e => { e.stopPropagation(); handleAddToEvent() }}>
                             <Plus size={14} /> Adicionar
                           </Button>
