@@ -281,9 +281,13 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
   },
 ]
 
-export function getConfigForCategory(categoryName: string): ServiceConfig | null {
-  if (!categoryName) return null
+export function getConfigForCategory(categoryName: string, productName = ''): ServiceConfig | null {
+  if (!categoryName && !productName) return null
   return SERVICE_CONFIGS.find(c =>
-    c.categoryNames.some(n => categoryName.toLowerCase().includes(n.toLowerCase()))
+    c.categoryNames.some(n =>
+      categoryName.toLowerCase().includes(n.toLowerCase()) ||
+      n.toLowerCase().includes(categoryName.toLowerCase()) ||
+      productName.toLowerCase().includes(n.toLowerCase())
+    )
   ) ?? null
 }
