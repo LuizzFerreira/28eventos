@@ -1,4 +1,4 @@
-export type FieldType = 'multiselect' | 'text' | 'number' | 'select' | 'multiselect_nested'
+export type FieldType = 'multiselect' | 'text' | 'number' | 'select' | 'multiselect_nested' | 'info'
 
 export interface NestedOption {
   label: string
@@ -139,6 +139,11 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
   {
     categoryNames: ['Bebidas'],
     fields: [
+      {
+        key: '_aviso',
+        label: 'Não fornecemos refrigeração, gelo, coolers ou qualquer estrutura de resfriamento para as bebidas. O cliente é responsável por providenciar o armazenamento adequado.',
+        type: 'info',
+      },
       {
         key: 'qtd_pessoas_beb',
         label: 'Quantas pessoas serão servidas?',

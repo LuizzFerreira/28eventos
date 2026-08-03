@@ -113,8 +113,17 @@ export function ServicePreferenceForm({ item }: Props) {
             <div className="px-4 pb-4 pt-2 space-y-5 border-t border-white/5">
               {config.fields.map(field => (
                 <div key={field.key}>
-                  <label className="text-white/70 text-sm font-medium block mb-2">{field.label}</label>
+                  {field.type !== 'info' && (
+                    <label className="text-white/70 text-sm font-medium block mb-2">{field.label}</label>
+                  )}
                   {field.hint && <p className="text-white/30 text-xs mb-2">{field.hint}</p>}
+
+                  {field.type === 'info' && (
+                    <div className="flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-3 py-2.5">
+                      <span className="text-yellow-400 text-lg leading-none mt-0.5">⚠️</span>
+                      <p className="text-yellow-200/80 text-xs leading-relaxed">{field.label}</p>
+                    </div>
+                  )}
 
                   {field.type === 'text' && (
                     <textarea

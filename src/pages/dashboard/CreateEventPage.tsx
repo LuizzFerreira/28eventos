@@ -167,18 +167,18 @@ export default function CreateEventPage() {
       </motion.div>
 
       {/* Stepper */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-2">
         {steps.map((s, i) => (
-          <div key={s} className="flex items-center gap-2 flex-shrink-0">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+          <div key={s} className="flex items-center gap-1.5 flex-shrink-0">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
               i === step ? 'gold-gradient text-black' :
               i < step ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
               'glass text-white/40'
             }`}>
-              {i < step ? <Check size={14} /> : <span>{i + 1}</span>}
-              {s}
+              {i < step ? <Check size={12} /> : <span>{i + 1}</span>}
+              <span className={i !== step && i > step ? 'hidden sm:inline' : ''}>{s}</span>
             </div>
-            {i < steps.length - 1 && <ChevronRight size={14} className="text-white/20 flex-shrink-0" />}
+            {i < steps.length - 1 && <ChevronRight size={12} className="text-white/20 flex-shrink-0" />}
           </div>
         ))}
       </div>
@@ -307,7 +307,7 @@ export default function CreateEventPage() {
 
           {/* Step 4: Serviços */}
           {step === 4 && (
-            <div className="grid lg:grid-cols-3 gap-6">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
                 <h2 className="text-xl font-bold text-white">Selecione os serviços</h2>
 
@@ -317,7 +317,7 @@ export default function CreateEventPage() {
                   placeholder="Buscar serviço... ex: DJ, foto, brinquedos"
                 />
 
-                <div className="grid sm:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-1">
                   {products?.map(product => {
                     const inCart = cart.find(i => i.produto.id === product.id)
                     return (
@@ -367,7 +367,7 @@ export default function CreateEventPage() {
               </div>
 
               {/* Cart summary */}
-              <div className="lg:sticky lg:top-8 h-fit">
+              <div className="lg:sticky lg:top-8 h-fit order-first lg:order-last">
                 <div className="glass-gold rounded-2xl p-5 space-y-4">
                   <div className="flex items-center gap-2">
                     <ShoppingCart size={18} className="text-[#c9a84c]" />

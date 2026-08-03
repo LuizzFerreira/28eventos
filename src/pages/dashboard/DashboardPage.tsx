@@ -125,7 +125,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex flex-wrap gap-3 mt-6">
             <Link to="/dashboard/evento">
               <Button size="sm">Ver detalhes <ArrowRight size={14} /></Button>
             </Link>
