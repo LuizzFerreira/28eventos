@@ -53,7 +53,7 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
     ],
   },
   {
-    categoryNames: ['Bartender', 'Open Bar'],
+    categoryNames: ['Bartender', 'Barman', 'Barmen', 'Bar', 'Open Bar'],
     fields: [
       {
         key: 'bebedores',
