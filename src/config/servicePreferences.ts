@@ -53,7 +53,7 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
     ],
   },
   {
-    categoryNames: ['Bartender', 'Barman', 'Barmen', 'Bar', 'Open Bar'],
+    categoryNames: ['Bartender', 'Barman', 'Barmen', 'Bar', 'Open Bar', 'Barr'],
     fields: [
       {
         key: 'bebedores',
@@ -63,20 +63,19 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
         hint: 'Usado para calcular a quantidade de insumos',
       },
       {
-        key: 'bebidas',
-        label: 'Bebidas desejadas',
+        key: 'drinks',
+        label: 'Drinks desejados',
         type: 'multiselect_nested',
         nestedOptions: [
           { label: 'Caipirinha', suboptions: ['Limão', 'Morango', 'Maracujá', 'Kiwi', 'Abacaxi', 'Uva', 'Manga', 'Mista'] },
-          { label: 'Cerveja', suboptions: ['Lager', 'IPA', 'Pilsen', 'Weiss', 'Sem álcool'] },
-          { label: 'Vinho', suboptions: ['Tinto seco', 'Tinto suave', 'Branco seco', 'Branco suave', 'Rosé', 'Espumante'] },
-          { label: 'Drinks sem álcool', suboptions: ['Limonada', 'Suco de frutas', 'Água com gás', 'Refrigerante'] },
-          { label: 'Whisky' },
-          { label: 'Vodka' },
-          { label: 'Gin' },
-          { label: 'Rum' },
-          { label: 'Tequila' },
-          { label: 'Chopp' },
+          { label: 'Caipiroska', suboptions: ['Limão', 'Morango', 'Maracujá', 'Frutas vermelhas', 'Manga'] },
+          { label: 'Mojito' },
+          { label: 'Aperol Spritz' },
+          { label: 'Gin Tônica', suboptions: ['Clássico', 'Com pepino', 'Com morango', 'Com lavanda'] },
+          { label: 'Vodka', suboptions: ['Puro', 'Com energético', 'Com suco', 'Com tônica'] },
+          { label: 'Rum', suboptions: ['Puro', 'Com cola', 'Com suco de limão'] },
+          { label: 'Tequila', suboptions: ['Shot', 'Margarita'] },
+          { label: 'Drinks sem álcool', suboptions: ['Limonada', 'Limonada suíça', 'Suco de frutas', 'Água com gás', 'Refrigerante', 'Mocktail de frutas'] },
           { label: 'Outros', suboptions: [] },
         ],
         summaryFn: (value, ctx) => {
@@ -84,17 +83,17 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
           if (!bebedores || !value) return null
           const sel = value as Record<string, string[]>
           const linhas: string[] = []
-          if (sel['Caipirinha']?.length) linhas.push(`🍋 Caipirinha (${sel['Caipirinha'].join(', ')}): ~${bebedores * 2} frutas, ${(bebedores * 0.05).toFixed(1)}L de cachaça`)
-          if (sel['Cerveja']?.length) linhas.push(`🍺 Cerveja: ~${Math.ceil(bebedores * 3)} unidades (350ml)`)
-          if (sel['Vinho']?.length) linhas.push(`🍷 Vinho: ~${Math.ceil(bebedores / 5)} garrafas`)
-          if (sel['Chopp']?.length) linhas.push(`🍺 Chopp: ~${Math.ceil(bebedores * 0.5)}L`)
-          if (sel['Whisky']?.length) linhas.push(`🥃 Whisky: ~${Math.ceil(bebedores / 10)} garrafas`)
+          if (sel['Caipirinha']?.length) linhas.push(`🍋 Caipirinha (${sel['Caipirinha'].join(', ')}): ~${bebedores * 2} frutas, ${(bebedores * 0.05).toFixed(1)}L de cachaça, ${Math.ceil(bebedores * 0.02)}kg de açúcar`)
+          if (sel['Caipiroska']?.length) linhas.push(`🍋 Caipiroska (${sel['Caipiroska'].join(', ')}): ~${bebedores * 2} frutas, ${(bebedores * 0.05).toFixed(1)}L de vodka`)
+          if (sel['Mojito'] !== undefined) linhas.push(`🌿 Mojito: ~${(bebedores * 0.05).toFixed(1)}L de rum, ${Math.ceil(bebedores * 0.5)} limões, hortelã, açúcar`)
+          if (sel['Aperol Spritz'] !== undefined) linhas.push(`🍊 Aperol Spritz: ~${Math.ceil(bebedores / 8)} garrafas de Aperol, ${Math.ceil(bebedores / 4)} garrafas de espumante`)
+          if (sel['Gin Tônica']?.length) linhas.push(`🍸 Gin Tônica: ~${Math.ceil(bebedores / 10)} garrafas de gin, ${Math.ceil(bebedores / 3)} latas de tônica`)
           if (sel['Vodka']?.length) linhas.push(`🍸 Vodka: ~${Math.ceil(bebedores / 10)} garrafas`)
-          if (sel['Gin']?.length) linhas.push(`🍸 Gin: ~${Math.ceil(bebedores / 10)} garrafas`)
           if (sel['Rum']?.length) linhas.push(`🍹 Rum: ~${Math.ceil(bebedores / 10)} garrafas`)
           if (sel['Tequila']?.length) linhas.push(`🥃 Tequila: ~${Math.ceil(bebedores / 15)} garrafas`)
-          const outros = (ctx.bebidas_outros as string | undefined)?.trim()
-          if (outros) linhas.push(`🍹 Outros drinks: ${outros}`)
+          if (sel['Drinks sem álcool']?.length) linhas.push(`🍹 Drinks sem álcool (${sel['Drinks sem álcool'].join(', ')}): ingredientes conforme seleção`)
+          const outros = (ctx.drinks_outros as string | undefined)?.trim()
+          if (outros) linhas.push(`🍹 Outros: ${outros}`)
           return linhas.length ? linhas.join('\n') : null
         },
       },
@@ -103,6 +102,86 @@ export const SERVICE_CONFIGS: ServiceConfig[] = [
         label: 'Restrições / observações',
         type: 'text',
         placeholder: 'Ex: sem bebida alcoólica para menores...',
+      },
+    ],
+  },
+  {
+    categoryNames: ['Chopp'],
+    fields: [
+      {
+        key: 'bebedores_chopp',
+        label: 'Quantas pessoas vão beber?',
+        type: 'number',
+        placeholder: 'Ex: 80',
+        hint: 'Usado para calcular a quantidade de chopp',
+      },
+      {
+        key: 'tipo_chopp',
+        label: 'Tipo de chopp',
+        type: 'multiselect',
+        options: ['Pilsen', 'Weiss', 'IPA', 'Dark/Escuro', 'Red Ale', 'Sem álcool'],
+        summaryFn: (value, ctx) => {
+          const bebedores = Number(ctx.bebedores_chopp) || 0
+          if (!bebedores || !value) return null
+          const tipos = value as string[]
+          if (!tipos.length) return null
+          return `🍺 Chopp (${tipos.join(', ')}): ~${Math.ceil(bebedores * 0.5)}L no total`
+        },
+      },
+      {
+        key: 'obs_chopp',
+        label: 'Observações',
+        type: 'text',
+        placeholder: 'Ex: preferência de marca, temperatura...',
+      },
+    ],
+  },
+  {
+    categoryNames: ['Bebidas'],
+    fields: [
+      {
+        key: 'qtd_pessoas_beb',
+        label: 'Quantas pessoas serão servidas?',
+        type: 'number',
+        placeholder: 'Ex: 100',
+        hint: 'Usado para calcular a quantidade de bebidas',
+      },
+      {
+        key: 'bebidas_sel',
+        label: 'Bebidas desejadas',
+        type: 'multiselect_nested',
+        nestedOptions: [
+          { label: 'Vinho', suboptions: ['Tinto seco', 'Tinto suave', 'Branco seco', 'Branco suave', 'Rosé', 'Espumante'] },
+          { label: 'Whisky', suboptions: ['Escocês', 'Bourbon', 'Irlandês', 'Blended'] },
+          { label: 'Cerveja', suboptions: ['Lager', 'Pilsen', 'IPA', 'Weiss', 'Sem álcool'] },
+          { label: 'Refrigerante', suboptions: ['Cola', 'Guaraná', 'Laranja', 'Limão', 'Tônica', 'Água com gás'] },
+          { label: 'Suco', suboptions: ['Laranja', 'Uva', 'Maracujá', 'Abacaxi', 'Goiaba', 'Manga', 'Misto'] },
+          { label: 'Água', suboptions: ['Sem gás', 'Com gás'] },
+          { label: 'Energético' },
+          { label: 'Outros', suboptions: [] },
+        ],
+        summaryFn: (value, ctx) => {
+          const pessoas = Number(ctx.qtd_pessoas_beb) || 0
+          if (!pessoas || !value) return null
+          const sel = value as Record<string, string[]>
+          const linhas: string[] = []
+          if (sel['Vinho']?.length) linhas.push(`🍷 Vinho (${sel['Vinho'].join(', ')}): ~${Math.ceil(pessoas / 5)} garrafas`)
+          if (sel['Whisky']?.length) linhas.push(`🥃 Whisky (${sel['Whisky'].join(', ')}): ~${Math.ceil(pessoas / 10)} garrafas`)
+          if (sel['Cerveja']?.length) linhas.push(`🍺 Cerveja (${sel['Cerveja'].join(', ')}): ~${Math.ceil(pessoas * 3)} unidades (350ml)`)
+          if (sel['Refrigerante']?.length) linhas.push(`🥤 Refrigerante (${sel['Refrigerante'].join(', ')}): ~${Math.ceil(pessoas * 0.3)}L`)
+          if (sel['Suco']?.length) linhas.push(`🧃 Suco (${sel['Suco'].join(', ')}): ~${Math.ceil(pessoas * 0.2)}L`)
+          if (sel['Água']?.length) linhas.push(`💧 Água (${sel['Água'].join(', ')}): ~${Math.ceil(pessoas * 0.5)}L`)
+          if (sel['Energético'] !== undefined) linhas.push(`⚡ Energético: ~${Math.ceil(pessoas * 0.3)} latas`)
+          const outros = (ctx.bebidas_sel_outros as string | undefined)?.trim()
+          if (outros) linhas.push(`🍹 Outros: ${outros}`)
+          return linhas.length ? linhas.join('\n') : null
+        },
+      },
+      {
+        key: 'obs_bebidas',
+        label: 'Observações',
+        type: 'text',
+        placeholder: 'Ex: preferência de marcas, bebidas para crianças...',
       },
     ],
   },
