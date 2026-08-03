@@ -20,8 +20,8 @@ export default function DashboardPage() {
   })
 
   const latestEvent = events?.[0]
-  const totalValue = events?.reduce((acc, e) => acc + (e.valor_total || 0), 0) || 0
   const confirmed = events?.filter(e => e.status === 'confirmado').length || 0
+  const confirmedValue = events?.filter(e => e.status === 'confirmado' || e.status === 'finalizado').reduce((acc, e) => acc + (e.valor_total || 0), 0) || 0
 
   return (
     <div className="space-y-8">
@@ -35,7 +35,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Calendar, label: 'Eventos', value: events?.length || 0, color: 'text-blue-400' },
-          { icon: DollarSign, label: 'Valor Total', value: formatCurrency(totalValue), color: 'text-green-400' },
+          { icon: DollarSign, label: 'Valor Confirmado', value: formatCurrency(confirmedValue), color: 'text-green-400' },
           { icon: Users, label: 'Confirmados', value: confirmed, color: 'text-[#c9a84c]' },
           { icon: Clock, label: 'Em Análise', value: events?.filter(e => e.status === 'em_analise').length || 0, color: 'text-purple-400' },
         ].map(({ icon: Icon, label, value, color }, i) => (
@@ -75,8 +75,14 @@ export default function DashboardPage() {
             </div>
             <div className="text-right">
               <Badge variant={statusBadge[latestEvent.status].variant}>{statusBadge[latestEvent.status].label}</Badge>
-              <div className="text-2xl font-black gold-text mt-2">{formatCurrency(latestEvent.valor_total)}</div>
-              <div className="text-white/40 text-xs">Valor estimado</div>
+              {(latestEvent.status === 'confirmado' || latestEvent.status === 'finalizado') ? (
+                <>
+                  <div className="text-2xl font-black gold-text mt-2">{formatCurrency(latestEvent.valor_total)}</div>
+                  <div className="text-white/40 text-xs">Valor do pacote</div>
+                </>
+              ) : (
+                <div className="text-white/30 text-xs mt-2">Valor após confirmação</div>
+              )}
             </div>
           </div>
 
@@ -160,7 +166,9 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant={statusBadge[event.status].variant}>{statusBadge[event.status].label}</Badge>
-                    <span className="text-[#c9a84c] font-semibold text-sm">{formatCurrency(event.valor_total)}</span>
+                    {(event.status === 'confirmado' || event.status === 'finalizado') && (
+                      <span className="text-[#c9a84c] font-semibold text-sm">{formatCurrency(event.valor_total)}</span>
+                    )}
                     <ArrowRight size={14} className="text-white/30" />
                   </div>
                 </motion.div>

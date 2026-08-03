@@ -133,32 +133,56 @@ export default function EventPage() {
 
       {/* Financial */}
       <div className="glass-gold rounded-2xl p-6">
-        <h2 className="text-white font-bold mb-4">Resumo Financeiro</h2>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-white/50 text-sm">Valor estimado</p>
-            <p className="text-4xl font-black gold-text">{formatCurrency(event.valor_total)}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-white/50 text-sm">{event.itens?.length || 0} serviços</p>
-            <Link to="/servicos">
-              <Button variant="outline" size="sm" className="mt-2"><Plus size={14} /> Adicionar</Button>
-            </Link>
-          </div>
-        </div>
-
-        {event.itens && event.itens.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
-            {event.itens.map(item => (
-              <div key={item.id} className="flex items-center justify-between text-sm">
-                <span className="text-white/70">{item.produto?.nome}</span>
-                <div className="flex items-center gap-4">
-                  <span className="text-white/40">x{item.quantidade}</span>
-                  <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
-                </div>
+        {event.status === 'confirmado' || event.status === 'finalizado' ? (
+          <>
+            <h2 className="text-white font-bold mb-4">Pacote Confirmado</h2>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-white/50 text-sm">Valor do pacote</p>
+                <p className="text-4xl font-black gold-text">{formatCurrency(event.valor_total)}</p>
               </div>
-            ))}
-          </div>
+              <div className="text-right">
+                <p className="text-white/50 text-sm">{event.itens?.length || 0} serviços</p>
+                <Link to="/servicos">
+                  <Button variant="outline" size="sm" className="mt-2"><Plus size={14} /> Adicionar</Button>
+                </Link>
+              </div>
+            </div>
+            {event.itens && event.itens.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+                {event.itens.map(item => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">{item.produto?.nome}</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-white/40">x{item.quantidade}</span>
+                      <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="text-white font-bold mb-1">Serviços selecionados</h2>
+            <p className="text-white/40 text-sm mb-4">O valor do pacote será apresentado após a confirmação do admin.</p>
+            <div className="flex items-center justify-between">
+              <p className="text-white/50 text-sm">{event.itens?.length || 0} serviço(s)</p>
+              <Link to="/servicos">
+                <Button variant="outline" size="sm"><Plus size={14} /> Adicionar</Button>
+              </Link>
+            </div>
+            {event.itens && event.itens.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
+                {event.itens.map(item => (
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <span className="text-white/70">{item.produto?.nome}</span>
+                    <span className="text-white/20 text-xs">x{item.quantidade}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 
