@@ -198,8 +198,8 @@ export default function EventPage() {
         )}
       </div>
 
-      {/* Personalize seus serviços */}
-      {event.itens && event.itens.length > 0 && (
+      {/* Personalize seus serviços - só após confirmação */}
+      {(event.status === 'confirmado' || event.status === 'finalizado') && event.itens && event.itens.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles size={18} className="text-[#c9a84c]" />
@@ -207,7 +207,7 @@ export default function EventPage() {
           </div>
           <p className="text-white/40 text-sm mb-5">Preencha as preferências de cada serviço para que tudo saia perfeito.</p>
           <div className="space-y-3">
-            {event.itens.map(item => (
+            {event.itens.filter(item => item.confirmado !== false).map(item => (
               <ServicePreferenceForm key={item.id} item={item} />
             ))}
           </div>
