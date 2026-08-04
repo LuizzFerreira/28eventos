@@ -151,14 +151,26 @@ export default function EventPage() {
             {event.itens && event.itens.length > 0 && (
               <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
                 {event.itens.map(item => (
-                  <div key={item.id} className="flex items-center justify-between text-sm">
-                    <span className="text-white/70">{item.produto?.nome}</span>
+                  <div key={item.id} className={`flex items-center justify-between text-sm ${
+                    item.confirmado === false ? 'opacity-40' : ''
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      {item.confirmado === false && <span className="text-red-400 text-xs line-through">{item.produto?.nome}</span>}
+                      {item.confirmado !== false && <span className="text-white/70">{item.produto?.nome}</span>}
+                    </div>
                     <div className="flex items-center gap-4">
                       <span className="text-white/40">x{item.quantidade}</span>
                       <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
                     </div>
                   </div>
                 ))}
+                {event.itens.some(i => i.confirmado === false) && (
+                  <div className="mt-3 flex items-start gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2.5">
+                    <span className="text-yellow-400 text-xs leading-relaxed">
+                      ⚠️ Alguns serviços não puderam ser incluídos neste pacote. Entre em contato conosco para mais informações.
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </>

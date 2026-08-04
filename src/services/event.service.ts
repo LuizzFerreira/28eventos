@@ -113,6 +113,36 @@ export const eventService = {
     if (error) throw error
   },
 
+  async confirmEvent(id: string, confirmedItemIds: string[]) {
+    // Marca cada item como confirmado ou não
+    const allItemIds = confirmedItemIds // só os selecionados chegam aqui
+    // Busca todos os itens do evento para marcar os não selecionados como false
+    const { data: allItems } = await supabase
+      .from('evento_itens')
+      .select('id')
+      .eq('evento_id', id)
+
+    const updates = (allItems ?? []).map((item: { id: string }) =>
+      supabase.from('evento_itens').update({ confirmado: allItemIds.includes(item.id) }).eq('id', item.id)
+    )
+    await Promise.all(updates)
+
+    // Recalcula valor_total com base nos itens confirmados
+    const { data: confirmedItems } = await supabase
+      .from('evento_itens')
+      .select('subtotal')
+      .eq('evento_id', id)
+      .in('id', confirmedItemIds)
+
+    const novoTotal = (confirmedItems ?? []).reduce((acc: number, i: { subtotal: number }) => acc + i.subtotal, 0)
+
+    const { error } = await supabase
+      .from('eventos')
+      .update({ status: 'confirmado', valor_total: novoTotal, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    if (error) throw error
+  },
+
   async deleteEvent(id: string) {
     const { error } = await supabase
       .from('eventos')

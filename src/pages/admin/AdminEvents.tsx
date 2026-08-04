@@ -30,6 +30,7 @@ export default function AdminEvents() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [cancelTarget, setCancelTarget] = useState<AdminEvent | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminEvent | null>(null)
+  const [selectedItems, setSelectedItems] = useState<Record<string, Set<string>>>({})
   const queryClient = useQueryClient()
 
   const { data: events, isLoading } = useQuery({
@@ -44,9 +45,31 @@ export default function AdminEvents() {
     onSuccess: (_, { status }) => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] })
       setCancelTarget(null)
-      toast.success(status === 'confirmado' ? 'Evento confirmado!' : status === 'cancelado' ? 'Evento cancelado.' : 'Evento rejeitado.')
+      toast.success(status === 'cancelado' ? 'Evento cancelado.' : 'Evento rejeitado.')
     },
   })
+
+  const confirmEvent = useMutation({
+    mutationFn: ({ id, itemIds }: { id: string; itemIds: string[] }) =>
+      eventService.confirmEvent(id, itemIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] })
+      toast.success('Evento confirmado!')
+    },
+  })
+
+  function getSelected(event: AdminEvent): Set<string> {
+    return selectedItems[event.id] ?? new Set((event.itens ?? []).map(i => i.id))
+  }
+
+  function toggleItem(eventId: string, itemId: string, allIds: string[]) {
+    setSelectedItems(prev => {
+      const current = prev[eventId] ?? new Set(allIds)
+      const next = new Set(current)
+      next.has(itemId) ? next.delete(itemId) : next.add(itemId)
+      return { ...prev, [eventId]: next }
+    })
+  }
 
   const deleteEvent = useMutation({
     mutationFn: (id: string) => eventService.deleteEvent(id),
@@ -156,17 +179,43 @@ export default function AdminEvents() {
                 {/* Serviços */}
                 {event.itens && event.itens.length > 0 && (
                   <div>
-                    <p className="text-white/40 text-xs mb-2">Serviços solicitados</p>
+                    <p className="text-white/40 text-xs mb-2">
+                      {(event.status === 'orcamento' || event.status === 'em_analise')
+                        ? 'Selecione os serviços que serão entregues'
+                        : 'Serviços solicitados'}
+                    </p>
                     <div className="space-y-2">
                       {event.itens.map(item => {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const pref = (item as any).preferencias as Record<string, unknown> | null
                         const catNome = item.produto?.categoria?.nome ?? ''
+                        const isPending = event.status === 'orcamento' || event.status === 'em_analise'
+                        const allIds = (event.itens ?? []).map(i => i.id)
+                        const checked = isPending ? getSelected(event).has(item.id) : (item.confirmado !== false)
                         return (
-                          <div key={item.id} className="bg-white/5 rounded-xl px-3 py-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-white/80">{item.produto?.nome}</span>
-                              <div className="flex items-center gap-4">
+                          <div key={item.id} className={`rounded-xl px-3 py-2 transition-all ${
+                            isPending
+                              ? checked ? 'bg-white/5' : 'bg-white/2 opacity-50'
+                              : item.confirmado === false ? 'bg-red-500/5 border border-red-500/10' : 'bg-white/5'
+                          }`}>
+                            <div className="flex items-center justify-between text-sm gap-3">
+                              {isPending && (
+                                <button
+                                  onClick={() => toggleItem(event.id, item.id, allIds)}
+                                  className={`w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer ${
+                                    checked ? 'bg-green-500 border-green-500' : 'border-white/20 hover:border-white/40'
+                                  }`}
+                                >
+                                  {checked && <Check size={11} className="text-white" />}
+                                </button>
+                              )}
+                              <span className={`flex-1 ${
+                                isPending && !checked ? 'line-through text-white/30' : 'text-white/80'
+                              }`}>{item.produto?.nome}</span>
+                              <div className="flex items-center gap-3 flex-shrink-0">
+                                {!isPending && item.confirmado === false && (
+                                  <span className="text-red-400 text-xs">Não incluído</span>
+                                )}
                                 <span className="text-white/40">x{item.quantidade}</span>
                                 <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
                               </div>
@@ -188,24 +237,37 @@ export default function AdminEvents() {
                 )}
 
                 {/* Actions */}
-                {(event.status === 'orcamento' || event.status === 'em_analise') && (
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-500"
-                      loading={updateStatus.isPending}
-                      onClick={() => updateStatus.mutate({ id: event.id, status: 'confirmado' })}
-                    >
-                      <Check size={15} /> Confirmar evento
-                    </Button>
-                    <button
-                      onClick={() => updateStatus.mutate({ id: event.id, status: 'em_criacao' })}
-                      disabled={updateStatus.isPending}
-                      className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50"
-                    >
-                      <X size={15} /> Rejeitar
-                    </button>
-                  </div>
-                )}
+                {(event.status === 'orcamento' || event.status === 'em_analise') && (() => {
+                  const sel = getSelected(event)
+                  const allIds = (event.itens ?? []).map(i => i.id)
+                  const someDeselected = allIds.some(id => !sel.has(id))
+                  return (
+                    <div className="space-y-2 pt-2">
+                      {someDeselected && (
+                        <p className="text-yellow-400/70 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2">
+                          ⚠️ {allIds.filter(id => !sel.has(id)).length} serviço(s) desmarcado(s) não serão incluídos no pacote do cliente.
+                        </p>
+                      )}
+                      <div className="flex gap-3">
+                        <Button
+                          className="flex-1 bg-green-600 hover:bg-green-500"
+                          loading={confirmEvent.isPending}
+                          onClick={() => confirmEvent.mutate({ id: event.id, itemIds: [...sel] })}
+                          disabled={sel.size === 0}
+                        >
+                          <Check size={15} /> Confirmar evento
+                        </Button>
+                        <button
+                          onClick={() => updateStatus.mutate({ id: event.id, status: 'em_criacao' })}
+                          disabled={updateStatus.isPending}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl glass text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium cursor-pointer disabled:opacity-50"
+                        >
+                          <X size={15} /> Rejeitar
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {event.status === 'confirmado' && (
                   <div className="pt-2">

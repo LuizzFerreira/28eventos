@@ -66,6 +66,7 @@ export interface EventItem {
   quantidade: number
   valor_unitario: number
   subtotal: number
+  confirmado?: boolean
 }
 
 export interface Event {
