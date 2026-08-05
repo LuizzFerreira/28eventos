@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
-import { Plus, Clock, ArrowRight, Check, XCircle } from 'lucide-react'
+import { Plus, Calendar, Clock, ArrowRight, Check, XCircle } from 'lucide-react'
 import imagemEvento from '@/assets/imagem-evento.png'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
