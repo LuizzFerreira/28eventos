@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productService } from '@/services/product.service'
 import { toast } from 'sonner'
-import { Upload, Trash2, Star, Loader, Plus, Video } from 'lucide-react'
+import { Trash2, Star, Loader, Plus, Video, Link, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 
@@ -15,6 +15,8 @@ export function ImageManager({ productId }: Props) {
   const [isUploading, setIsUploading] = useState(false)
   const [videoUrl, setVideoUrl] = useState('')
   const [showVideoInput, setShowVideoInput] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [showImageUrlInput, setShowImageUrlInput] = useState(false)
 
   const { data: product } = useQuery({
     queryKey: ['admin-product', productId],
@@ -48,6 +50,14 @@ export function ImageManager({ productId }: Props) {
     onSuccess: () => { invalidate(); toast.success('Vídeo removido.') },
   })
 
+  const addImageUrlMutation = useMutation({
+    mutationFn: async (url: string) => {
+      const ordem = images.length === 0 ? 0 : 1
+      await productService.createProductImage(productId, url, ordem)
+    },
+    onSuccess: () => { invalidate(); setImageUrl(''); setShowImageUrlInput(false); toast.success('Imagem adicionada!') },
+  })
+
   const addVideoMutation = useMutation({
     mutationFn: async (url: string) => {
       await productService.updateProduct(productId, { videos: [...videos, url] })
@@ -79,16 +89,42 @@ export function ImageManager({ productId }: Props) {
     <div className="space-y-4 pt-4 border-t border-white/5">
       <div className="flex items-center justify-between">
         <h3 className="text-white/80 font-semibold text-sm">Mídia do produto</h3>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button
             type="button"
-            onClick={() => setShowVideoInput(v => !v)}
+            onClick={() => { setShowImageUrlInput(v => !v); setShowVideoInput(false) }}
             className="flex items-center gap-1.5 text-xs text-white/50 hover:text-[#c9a84c] transition-colors cursor-pointer"
           >
-            <Video size={13} /> Adicionar vídeo
+            <Link size={13} /> Link de imagem
+          </button>
+          <button
+            type="button"
+            onClick={() => { setShowVideoInput(v => !v); setShowImageUrlInput(false) }}
+            className="flex items-center gap-1.5 text-xs text-white/50 hover:text-[#c9a84c] transition-colors cursor-pointer"
+          >
+            <Video size={13} /> Link de vídeo
           </button>
         </div>
       </div>
+
+      {/* Image URL input */}
+      {showImageUrlInput && (
+        <div className="flex gap-2">
+          <Input
+            placeholder="URL da imagem (ex: https://site.com/foto.jpg)"
+            value={imageUrl}
+            onChange={e => setImageUrl(e.target.value)}
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => imageUrl && addImageUrlMutation.mutate(imageUrl)}
+            loading={addImageUrlMutation.isPending}
+          >
+            <Plus size={14} />
+          </Button>
+        </div>
+      )}
 
       {/* Video input */}
       {showVideoInput && (
@@ -167,7 +203,7 @@ export function ImageManager({ productId }: Props) {
           ) : (
             <>
               <Upload size={20} />
-              <span className="text-xs mt-1 text-center">Adicionar</span>
+              <span className="text-xs mt-1 text-center">Upload</span>
             </>
           )}
           <input type="file" accept="image/*" multiple className="sr-only" onChange={handleUpload} disabled={isUploading} />
