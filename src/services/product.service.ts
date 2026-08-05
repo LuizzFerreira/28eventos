@@ -105,6 +105,16 @@ export const productService = {
     if (error) throw error
   },
 
+  async setDestaqueImage(produto_id: string, destaque_id: string) {
+    // Reset all images ordem to 1, then set the destaque to 0
+    const { data: imgs } = await supabase.from('imagens').select('id').eq('produto_id', produto_id)
+    if (imgs) {
+      for (const img of imgs) {
+        await supabase.from('imagens').update({ ordem: img.id === destaque_id ? 0 : 1 }).eq('id', img.id)
+      }
+    }
+  },
+
   async deleteProductImages(productId: string) {
     const { data: images, error: imgErr } = await supabase.from('imagens').select('url').eq('produto_id', productId)
     if(imgErr) throw imgErr

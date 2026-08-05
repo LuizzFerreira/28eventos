@@ -5,11 +5,11 @@
 -- As categorias já devem estar inseridas (schema.sql)
 
 insert into public.produtos (nome, descricao, preco, categoria_id, ativo, destaque)
-select 'DJ Profissional', 'DJ com equipamento completo, iluminação básica e até 6h de música ao vivo. Atende todos os estilos musicais.', 1800.00, id, true, true
+select 'DJ Profissional', 'DJ com equipamento completo: 🔊 2 Caixas de Som 🎤 2 Microfones para Discursos e Interações 💡 Luzes de Boate 💨 Máquina de Fumaça', 1800.00, id, true, true
 from public.categorias where nome = 'DJ';
 
 insert into public.produtos (nome, descricao, preco, categoria_id, ativo, destaque)
-select 'DJ Premium', 'DJ com setup completo, controladora profissional, cabine personalizada e até 8h. Rider técnico incluso.', 3200.00, id, true, false
+select 'DJ Premium', 'DJ com setup completo, controladora profissional, cabine personalizada e até 5h. Rider técnico incluso.', 3200.00, id, true, false
 from public.categorias where nome = 'DJ';
 
 insert into public.produtos (nome, descricao, preco, categoria_id, ativo, destaque)
