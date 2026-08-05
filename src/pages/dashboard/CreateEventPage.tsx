@@ -8,8 +8,8 @@ import { eventService, sendQuoteEmail } from '@/services/event.service'
 import { productService } from '@/services/product.service'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/Button'
-import { Input, Select } from '@/components/ui/Input'
-import { formatCurrency, fetchAddressByCEP, formatCEP } from '@/utils/cn'
+import { Input } from '@/components/ui/Input'
+import { fetchAddressByCEP, formatCEP } from '@/utils/cn'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { Check, ChevronRight, Minus, Plus, ShoppingCart } from 'lucide-react'
@@ -54,7 +54,6 @@ export default function CreateEventPage() {
   const [possuiAniversariante, setPossuiAniversariante] = useState(false)
   const [nomeAniversariante, setNomeAniversariante] = useState('')
   const [idadeAniversariante, setIdadeAniversariante] = useState('')
-  const [sexoAniversariante, setSexoAniversariante] = useState('')
   const [cart, setCart] = useState<{ produto: Product; quantidade: number }[]>([])
   const [_eventId, setEventId] = useState<string | null>(null)
 
@@ -87,7 +86,6 @@ export default function CreateEventPage() {
         possui_aniversariante: possuiAniversariante,
         nome_aniversariante: nomeAniversariante,
         idade_aniversariante: Number(idadeAniversariante),
-        sexo_aniversariante: sexoAniversariante,
       } as Parameters<typeof eventService.createEvent>[1])
       setEventId(event.id)
 
@@ -144,8 +142,6 @@ export default function CreateEventPage() {
     if (qty <= 0) return removeFromCart(productId)
     setCart(prev => prev.map(i => i.produto.id === productId ? { ...i, quantidade: qty } : i))
   }
-
-  const cartTotal = cart.reduce((acc, i) => acc + i.produto.preco * i.quantidade, 0)
 
   async function handleNext() {
     if (step === 1) {
@@ -288,14 +284,7 @@ export default function CreateEventPage() {
               {possuiAniversariante && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                   <Input label="Nome do aniversariante" placeholder="Nome completo" value={nomeAniversariante} onChange={e => setNomeAniversariante(e.target.value)} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
-                    <Select label="Sexo" value={sexoAniversariante} onChange={e => setSexoAniversariante(e.target.value)}>
-                      <option value="">Selecione</option>
-                      <option value="masculino">Masculino</option>
-                      <option value="feminino">Feminino</option>
-                    </Select>
-                  </div>
+                  <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
                 </motion.div>
               )}
               <div className="flex gap-3">
@@ -335,7 +324,6 @@ export default function CreateEventPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium text-sm truncate">{product.nome}</p>
                             <p className="text-white/50 text-xs line-clamp-1">{product.descricao}</p>
-                            <p className="text-[#c9a84c] font-bold text-sm mt-1">{formatCurrency(product.preco)}</p>
                           </div>
                         </div>
                         {inCart ? (
@@ -382,21 +370,13 @@ export default function CreateEventPage() {
                         <div key={item.produto.id} className="flex items-center justify-between text-sm">
                           <span className="text-white/70 truncate flex-1">{item.produto.nome}</span>
                           <span className="text-white/50 mx-2">x{item.quantidade}</span>
-                          <span className="text-[#c9a84c] font-medium flex-shrink-0">{formatCurrency(item.produto.preco * item.quantidade)}</span>
                         </div>
                       ))}
                     </div>
                   )}
 
                   <div className="border-t border-white/10 pt-3">
-                    <div className="flex justify-between text-sm text-white/60 mb-1">
-                      <span>Subtotal</span>
-                      <span>{formatCurrency(cartTotal)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold">
-                      <span className="text-white">Total estimado</span>
-                      <span className="gold-text text-lg">{formatCurrency(cartTotal)}</span>
-                    </div>
+                    <p className="text-white/40 text-xs text-center">O valor do pacote será apresentado após a confirmação.</p>
                   </div>
 
                   <Button
