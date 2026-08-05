@@ -19,12 +19,9 @@ export function ServiceDetailModal({ product, onClose, onAddToEvent, onFavorite 
   const [showVideo, setShowVideo] = useState<string | null>(null)
   const [playing, setPlaying] = useState(true)
 
-  if (!product) return null
-
-  // Sort images: destaque (ordem=0) first
-  const sortedImages = [...(product.imagens ?? [])].sort((a, b) => a.ordem - b.ordem)
-  const images = sortedImages.length ? sortedImages : [{ id: '0', produto_id: product.id, url: FALLBACK, ordem: 0 }]
-  const videos = product.videos ?? []
+  const sortedImages = [...(product?.imagens ?? [])].sort((a, b) => a.ordem - b.ordem)
+  const images = sortedImages.length ? sortedImages : [{ id: '0', produto_id: product?.id ?? '', url: FALLBACK, ordem: 0 }]
+  const videos = product?.videos ?? []
   const media = [
     ...images.map(i => ({ type: 'image' as const, src: i.url })),
     ...videos.map(v => ({ type: 'video' as const, src: v })),
@@ -40,15 +37,20 @@ export function ServiceDetailModal({ product, onClose, onAddToEvent, onFavorite 
     setShowVideo(null)
   }, [media.length])
 
-  // Autoplay — pausa quando está num vídeo ou playing=false
   useEffect(() => {
-    if (!playing || media.length <= 1 || media[imgIndex].type === 'video') return
+    if (!product) return
+    setImgIndex(0)
+    setShowVideo(null)
+    setPlaying(true)
+  }, [product?.id])
+
+  useEffect(() => {
+    if (!playing || media.length <= 1 || media[imgIndex]?.type === 'video') return
     const timer = setInterval(next, AUTOPLAY_INTERVAL)
     return () => clearInterval(timer)
   }, [playing, imgIndex, media.length, next])
 
-  // Reset ao abrir
-  useEffect(() => { setImgIndex(0); setShowVideo(null); setPlaying(true) }, [product.id])
+  if (!product) return null
 
   const current = media[imgIndex]
 
@@ -122,8 +124,6 @@ export function ServiceDetailModal({ product, onClose, onAddToEvent, onFavorite 
                     <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 glass rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors cursor-pointer z-10">
                       <ChevronRight size={16} />
                     </button>
-
-                    {/* Autoplay toggle + dots */}
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
                       <button
                         onClick={() => setPlaying(p => !p)}
@@ -145,7 +145,6 @@ export function ServiceDetailModal({ product, onClose, onAddToEvent, onFavorite 
                 )}
               </div>
 
-              {/* Thumbnails */}
               {media.length > 1 && (
                 <div className="flex gap-2 p-3 overflow-x-auto bg-black/20">
                   {media.map((m, i) => (
