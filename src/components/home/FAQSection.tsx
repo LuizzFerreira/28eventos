@@ -40,7 +40,7 @@ export function FAQSection() {
         viewport={{ once: true }}
         className="text-center mb-12"
       >
-        <span className="text-[#c9a84c] text-sm font-semibold tracking-widest uppercase">FAQ</span>
+        <span className="text-[#c9a84c] text-sm font-semibold tracking-widest uppercase">Dúvidas</span>
         <h2 className="text-4xl sm:text-5xl font-black text-white mt-3">
           Perguntas <span className="gold-text">frequentes</span>
         </h2>
@@ -107,7 +107,7 @@ export function ContactSection() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5521995575988"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 gold-gradient text-black font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity"
@@ -115,7 +115,7 @@ export function ContactSection() {
               Falar no WhatsApp
             </a>
             <a
-              href="mailto:contato@28eventos.com.br"
+              href="mailto:luizgferreira13@gmail.com"
               className="inline-flex items-center gap-2 border border-[#c9a84c] text-[#c9a84c] font-semibold px-8 py-4 rounded-xl hover:bg-[#c9a84c]/10 transition-colors"
             >
               Enviar e-mail

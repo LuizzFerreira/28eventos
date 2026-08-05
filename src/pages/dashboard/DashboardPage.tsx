@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
-import { Plus, Calendar, DollarSign, Users, Clock, ArrowRight, Check, XCircle } from 'lucide-react'
+import { Plus, Clock, ArrowRight, Check, XCircle } from 'lucide-react'
+import imagemEvento from '@/assets/imagem-evento.png'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
@@ -20,8 +21,6 @@ export default function DashboardPage() {
   })
 
   const latestEvent = events?.[0]
-  const confirmed = events?.filter(e => e.status === 'confirmado').length || 0
-  const confirmedValue = events?.filter(e => e.status === 'confirmado' || e.status === 'finalizado').reduce((acc, e) => acc + (e.valor_total || 0), 0) || 0
 
   return (
     <div className="space-y-8">
@@ -32,28 +31,9 @@ export default function DashboardPage() {
         <p className="text-white/50 mt-1">Bem-vindo ao seu painel de eventos.</p>
       </motion.div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: Calendar, label: 'Eventos', value: events?.length || 0, color: 'text-blue-400' },
-          { icon: DollarSign, label: 'Valor Confirmado', value: formatCurrency(confirmedValue), color: 'text-green-400' },
-          { icon: Users, label: 'Confirmados', value: confirmed, color: 'text-[#c9a84c]' },
-          { icon: Clock, label: 'Em Análise', value: events?.filter(e => e.status === 'em_analise').length || 0, color: 'text-purple-400' },
-        ].map(({ icon: Icon, label, value, color }, i) => (
-          <motion.div
-            key={label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass rounded-2xl p-5"
-          >
-            <Icon size={20} className={color} />
-            <div className="text-2xl font-black text-white mt-3">
-              {isLoading ? <Skeleton className="h-7 w-16" /> : value}
-            </div>
-            <div className="text-white/50 text-sm mt-1">{label}</div>
-          </motion.div>
-        ))}
-      </div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <img src={imagemEvento} alt="Eventos" className="w-full rounded-2xl object-cover max-h-64" />
+      </motion.div>
 
       {isLoading ? (
         <Skeleton className="h-48 w-full" />

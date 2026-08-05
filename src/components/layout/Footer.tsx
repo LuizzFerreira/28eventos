@@ -50,13 +50,13 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">Contato</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-white/50 text-sm">
-                <Phone size={14} className="text-[#c9a84c]" /> (11) 99999-9999
+                <Phone size={14} className="text-[#c9a84c]" /> (21) 99557-5988
               </li>
               <li className="flex items-center gap-2 text-white/50 text-sm">
-                <Mail size={14} className="text-[#c9a84c]" /> contato@28eventos.com.br
+                <Mail size={14} className="text-[#c9a84c]" /> luizgferreira13@gmail.com
               </li>
               <li className="flex items-center gap-2 text-white/50 text-sm">
-                <MapPin size={14} className="text-[#c9a84c]" /> São Paulo, SP
+                <MapPin size={14} className="text-[#c9a84c]" /> Rio de Janeiro, RJ
               </li>
             </ul>
           </div>
