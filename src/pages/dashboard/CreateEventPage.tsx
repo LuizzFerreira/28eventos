@@ -337,7 +337,6 @@ export default function CreateEventPage() {
                                 <Plus size={12} />
                               </button>
                             </div>
-                            <span className="text-[#c9a84c] text-sm font-semibold">{formatCurrency(product.preco * inCart.quantidade)}</span>
                           </div>
                         ) : (
                           <Button size="sm" className="w-full mt-3" onClick={() => addToCart(product)}>
