@@ -18,9 +18,7 @@ import type { EventType, Product } from '@/types'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
-// Tipos que sempre têm aniversariante — pula a pergunta e vai direto aos campos
 const SEMPRE_ANIVERSARIANTE: EventType[] = ['aniversario', '15_anos', 'infantil']
-// Tipos que nunca têm aniversariante — pula o step inteiro
 const NUNCA_ANIVERSARIANTE: EventType[] = ['casamento', 'corporativo', 'formatura', 'outro']
 
 const step2Schema = z.object({
@@ -51,7 +49,6 @@ const eventTypes: { value: EventType; label: string }[] = [
   { value: 'outro', label: 'Outro' },
 ]
 
-// Steps visíveis para o indicador (sem "Aniversariante" pois é condicional)
 const STEP_LABELS = ['Tipo', 'Dados', 'Local', 'Serviços']
 
 export default function CreateEventPage() {
@@ -82,7 +79,6 @@ export default function CreateEventPage() {
         await new Promise(r => setTimeout(r, 800))
         return
       }
-
       const d2 = form2.getValues()
       const d3 = form3.getValues()
       const event = await eventService.createEvent(profile!.id, {
@@ -94,7 +90,6 @@ export default function CreateEventPage() {
         idade_aniversariante: Number(idadeAniversariante),
       } as Parameters<typeof eventService.createEvent>[1])
       setEventId(event.id)
-
       for (const item of cart) {
         await eventService.addItem({
           evento_id: event.id,
@@ -104,13 +99,10 @@ export default function CreateEventPage() {
           subtotal: item.produto.preco * item.quantidade,
         })
       }
-
       const total = cart.reduce((acc, i) => acc + i.produto.preco * i.quantidade, 0)
       await eventService.updateEvent(event.id, { valor_total: total, status: 'orcamento' })
-
       const fullEvent = await eventService.getEventWithItems(event.id)
       await sendQuoteEmail(fullEvent, profile!.nome ?? '', profile!.email).catch(() => {})
-
       return event
     },
     onSuccess: () => {
@@ -157,24 +149,20 @@ export default function CreateEventPage() {
     if (step === 2) {
       const valid = await form3.trigger()
       if (!valid) return
-      // Após local: decide se mostra step de aniversariante
       if (tipo && NUNCA_ANIVERSARIANTE.includes(tipo)) {
         setPossuiAniversariante(false)
-        setStep(4) // pula direto para serviços
+        setStep(4)
         return
       }
       if (tipo && SEMPRE_ANIVERSARIANTE.includes(tipo)) {
         setPossuiAniversariante(true)
-        setStep(3) // vai para campos do aniversariante (sem a pergunta sim/não)
+        setStep(3)
         return
       }
     }
     setStep(s => s + 1)
   }
 
-  // Indicador de progresso simplificado
-  // step 0=Tipo, 1=Dados, 2=Local, 3=Aniversariante(condicional), 4=Serviços
-  // Mapeia para os 4 labels visíveis
   const indicatorIndex = step === 4 ? 3 : step === 3 ? 2 : step
 
   return (
@@ -184,7 +172,7 @@ export default function CreateEventPage() {
         <p className="text-white/50 mt-1 text-sm">Monte o evento dos seus sonhos passo a passo.</p>
       </motion.div>
 
-      {/* Indicador de progresso simples */}
+      {/* Indicador de progresso */}
       <div className="flex items-center gap-2">
         {STEP_LABELS.map((label, i) => (
           <div key={label} className="flex items-center gap-2 flex-shrink-0">
@@ -291,14 +279,12 @@ export default function CreateEventPage() {
           {step === 3 && (
             <div className="space-y-4 w-full max-w-xl">
               {tipo && SEMPRE_ANIVERSARIANTE.includes(tipo) ? (
-                // Já sabemos que tem aniversariante — pede direto as infos
                 <>
                   <h2 className="text-lg sm:text-xl font-bold text-white">Dados do aniversariante</h2>
                   <Input label="Nome do aniversariante" placeholder="Nome completo" value={nomeAniversariante} onChange={e => setNomeAniversariante(e.target.value)} />
                   <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
                 </>
               ) : (
-                // Pergunta sim/não (para tipos ambíguos — não deve chegar aqui com a lógica atual)
                 <>
                   <h2 className="text-lg sm:text-xl font-bold text-white">Tem aniversariante?</h2>
                   <div className="flex gap-3">
@@ -332,38 +318,6 @@ export default function CreateEventPage() {
           {/* Step 4: Serviços */}
           {step === 4 && (
             <div className="flex flex-col gap-6">
-              {/* Cart summary */}
-              <div className="glass-gold rounded-2xl p-4 sm:p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart size={18} className="text-[#c9a84c]" />
-                  <h3 className="text-white font-bold">Resumo do pedido</h3>
-                </div>
-                {cart.length === 0 ? (
-                  <p className="text-white/40 text-sm text-center py-2">Nenhum serviço adicionado</p>
-                ) : (
-                  <div className="space-y-2">
-                    {cart.map(item => (
-                      <div key={item.produto.id} className="flex items-center justify-between text-sm">
-                        <span className="text-white/70 truncate flex-1">{item.produto.nome}</span>
-                        <span className="text-white/50 ml-2">x{item.quantidade}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <div className="border-t border-white/10 pt-3">
-                  <p className="text-white/40 text-xs text-center">O valor será apresentado após a confirmação.</p>
-                </div>
-                <Button
-                  className="w-full"
-                  loading={createMutation.isPending}
-                  onClick={() => createMutation.mutate()}
-                  disabled={cart.length === 0}
-                >
-                  Solicitar Orçamento
-                </Button>
-                <p className="text-white/30 text-xs text-center">Nossa equipe entrará em contato em até 24h</p>
-              </div>
-
               {/* Lista de serviços */}
               <div className="space-y-4">
                 <h2 className="text-lg sm:text-xl font-bold text-white">Selecione os serviços</h2>
@@ -415,10 +369,41 @@ export default function CreateEventPage() {
                   })}
                 </div>
                 <Button variant="outline" onClick={() => {
-                  // Voltar: se tipo nunca tem aniversariante, volta para local; senão volta para step 3
                   if (tipo && NUNCA_ANIVERSARIANTE.includes(tipo)) setStep(2)
                   else setStep(3)
                 }} className="w-full sm:w-auto">Voltar</Button>
+              </div>
+
+              {/* Resumo do pedido — sempre no final */}
+              <div className="glass-gold rounded-2xl p-4 sm:p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart size={18} className="text-[#c9a84c]" />
+                  <h3 className="text-white font-bold">Resumo do pedido</h3>
+                </div>
+                {cart.length === 0 ? (
+                  <p className="text-white/40 text-sm text-center py-2">Nenhum serviço adicionado</p>
+                ) : (
+                  <div className="space-y-2">
+                    {cart.map(item => (
+                      <div key={item.produto.id} className="flex items-center justify-between text-sm">
+                        <span className="text-white/70 truncate flex-1">{item.produto.nome}</span>
+                        <span className="text-white/50 ml-2">x{item.quantidade}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="border-t border-white/10 pt-3">
+                  <p className="text-white/40 text-xs text-center">O valor será apresentado após a confirmação.</p>
+                </div>
+                <Button
+                  className="w-full"
+                  loading={createMutation.isPending}
+                  onClick={() => createMutation.mutate()}
+                  disabled={cart.length === 0}
+                >
+                  Solicitar Orçamento
+                </Button>
+                <p className="text-white/30 text-xs text-center">Nossa equipe entrará em contato em até 24h</p>
               </div>
             </div>
           )}
