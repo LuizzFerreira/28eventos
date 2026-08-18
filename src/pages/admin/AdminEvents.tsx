@@ -33,6 +33,8 @@ export default function AdminEvents() {
   const [selectedItems, setSelectedItems] = useState<Record<string, Set<string>>>({})
   const [editingPrice, setEditingPrice] = useState<Record<string, string>>({})
   const [savingPrice, setSavingPrice] = useState<string | null>(null)
+  const [editingPago, setEditingPago] = useState<Record<string, string>>({})
+  const [savingPago, setSavingPago] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   const { data: events, isLoading } = useQuery({
@@ -78,6 +80,22 @@ export default function AdminEvents() {
       toast.error('Erro ao salvar valor.')
     } finally {
       setSavingPrice(null)
+    }
+  }
+
+  async function savePago(eventId: string, valor: string) {
+    const num = parseFloat(valor.replace(',', '.'))
+    if (isNaN(num) || num < 0) return
+    setSavingPago(eventId)
+    try {
+      await eventService.updateValorPago(eventId, num)
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] })
+      toast.success('Valor pago atualizado!')
+      setEditingPago(prev => { const n = { ...prev }; delete n[eventId]; return n })
+    } catch {
+      toast.error('Erro ao salvar.')
+    } finally {
+      setSavingPago(null)
     }
   }
 
@@ -192,6 +210,49 @@ export default function AdminEvents() {
                   <div className="bg-white/5 rounded-xl p-3 text-sm">
                     <span className="text-white/40 text-xs block mb-1">Observações</span>
                     <span className="text-white/80">{event.observacoes}</span>
+                  </div>
+                )}
+
+                {/* Pagamento */}
+                {(event.status === 'confirmado' || event.status === 'finalizado') && (
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <p className="text-white/40 text-xs mb-3">Controle de pagamento</p>
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <p className="text-white/50 text-xs">Total do evento</p>
+                        <p className="text-white font-bold">{formatCurrency(event.valor_total)}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white/50 text-xs">50% (entrada)</p>
+                        <p className="text-[#c9a84c] font-bold">{formatCurrency(event.valor_total / 2)}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-white/50 text-sm flex-shrink-0">Valor pago: R$</span>
+                      {editingPago[event.id] !== undefined ? (
+                        <div className="flex items-center gap-1 flex-1">
+                          <input
+                            autoFocus
+                            className="flex-1 bg-white/10 border border-[#c9a84c]/50 rounded-lg px-2 py-1 text-[#c9a84c] text-sm font-medium outline-none focus:border-[#c9a84c]"
+                            value={editingPago[event.id]}
+                            onChange={e => setEditingPago(prev => ({ ...prev, [event.id]: e.target.value }))}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') savePago(event.id, editingPago[event.id])
+                              if (e.key === 'Escape') setEditingPago(prev => { const n = { ...prev }; delete n[event.id]; return n })
+                            }}
+                          />
+                          <button onClick={() => savePago(event.id, editingPago[event.id])} disabled={savingPago === event.id} className="text-green-400 hover:text-green-300 cursor-pointer disabled:opacity-50"><Check size={15} /></button>
+                          <button onClick={() => setEditingPago(prev => { const n = { ...prev }; delete n[event.id]; return n })} className="text-white/30 hover:text-white/60 cursor-pointer"><X size={15} /></button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setEditingPago(prev => ({ ...prev, [event.id]: String(event.valor_pago ?? 0) }))}
+                          className="flex items-center gap-1.5 text-[#c9a84c] font-bold hover:underline cursor-pointer"
+                        >
+                          {formatCurrency(event.valor_pago ?? 0)} <Pencil size={12} className="text-white/30" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 

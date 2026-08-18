@@ -7,7 +7,7 @@ import { Badge, statusBadge, Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate, eventTypeLabels } from '@/utils/cn'
 import { Link } from 'react-router-dom'
-import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock, XCircle, Sparkles } from 'lucide-react'
+import { Plus, Check, Trash2, Calendar, MapPin, Users, Clock, XCircle, Sparkles, AlertCircle } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/Input'
@@ -148,6 +148,69 @@ export default function EventPage() {
                 </Link>
               </div>
             </div>
+
+            {/* Bloco de pagamento */}
+            {(() => {
+              const total = event.valor_total
+              const pago = event.valor_pago ?? 0
+              const metade = total / 2
+              const quitado = pago >= total
+              const entradaPaga = pago >= metade
+              const diasParaEvento = event.data
+                ? Math.ceil((new Date(event.data).getTime() - Date.now()) / 86400000)
+                : null
+              const alertaFinal = !quitado && entradaPaga && diasParaEvento !== null && diasParaEvento <= 4 && diasParaEvento >= 0
+
+              return (
+                <div className="mt-5 pt-5 border-t border-white/10 space-y-3">
+                  <div className="bg-white/5 rounded-xl p-4 text-sm text-white/70 leading-relaxed">
+                    <p>
+                      Para confirmação e reserva da data é preciso realizar o pagamento de{' '}
+                      <span className="text-white font-semibold">50% do valor total ({formatCurrency(metade)})</span>,{' '}
+                      <span className="text-[#c9a84c] font-semibold">ANTECIPADO</span>, e os outros{' '}
+                      <span className="text-white font-semibold">50% até a data do evento</span>.
+                    </p>
+                  </div>
+
+                  <div className={`rounded-xl p-4 flex items-center justify-between ${
+                    quitado ? 'bg-green-500/10 border border-green-500/20'
+                    : alertaFinal ? 'bg-red-500/10 border border-red-500/20'
+                    : 'bg-white/5'
+                  }`}>
+                    <div>
+                      <p className="text-white/40 text-xs mb-0.5">Já pago</p>
+                      <p className={`text-xl font-bold ${
+                        quitado ? 'text-green-400' : 'text-[#c9a84c]'
+                      }`}>{formatCurrency(pago)}</p>
+                    </div>
+                    <div className="text-right">
+                      {quitado ? (
+                        <span className="text-green-400 text-sm font-semibold flex items-center gap-1.5">
+                          <Check size={14} /> Pagamento quitado
+                        </span>
+                      ) : !entradaPaga ? (
+                        <span className="text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-2.5 py-1">
+                          ⏳ Pagamento da entrada pendente
+                        </span>
+                      ) : (
+                        <span className="text-white/50 text-xs">
+                          Restam {formatCurrency(total - pago)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {alertaFinal && (
+                    <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5">
+                      <AlertCircle size={15} className="text-red-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-red-300 text-xs leading-relaxed">
+                        Faltam <strong>{diasParaEvento} dia(s)</strong> para o evento e o pagamento final ainda está pendente ({formatCurrency(total - pago)}). Entre em contato conosco.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
             {event.itens && event.itens.length > 0 && (
               <div className="mt-4 pt-4 border-t border-white/10 space-y-2">
                 {event.itens.map(item => (

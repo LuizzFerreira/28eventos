@@ -105,6 +105,14 @@ export const eventService = {
     }))
   },
 
+  async updateValorPago(id: string, valor_pago: number) {
+    const { error } = await supabase
+      .from('eventos')
+      .update({ valor_pago, updated_at: new Date().toISOString() })
+      .eq('id', id)
+    if (error) throw error
+  },
+
   async updateStatus(id: string, status: Event['status']) {
     const { error } = await supabase
       .from('eventos')

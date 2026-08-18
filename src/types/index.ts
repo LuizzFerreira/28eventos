@@ -91,6 +91,7 @@ export interface Event {
   sexo_aniversariante?: string
   observacoes?: string
   valor_total: number
+  valor_pago: number
   status: EventStatus
   itens?: EventItem[]
   created_at: string
