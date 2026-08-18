@@ -35,7 +35,7 @@ export function DashboardLayout() {
   if (!user) return <Navigate to="/" replace />
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0a]">
+    <div className="min-h-screen flex bg-[#0a0a0a] overflow-x-hidden">
       {/* Sidebar */}
       <motion.aside
         className={`fixed inset-y-0 left-0 z-30 w-64 glass-solid border-r border-white/10 flex flex-col
@@ -107,7 +107,7 @@ export function DashboardLayout() {
       )}
 
       {/* Main */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen min-w-0 w-0">
         <header className="glass-solid border-b border-white/5 px-4 sm:px-6 py-4 flex items-center gap-4 lg:hidden">
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-white">
             {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
@@ -115,7 +115,7 @@ export function DashboardLayout() {
           <span className="text-white font-semibold">Painel</span>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden min-w-0">
           <Outlet />
         </main>
       </div>

@@ -156,7 +156,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="w-full max-w-5xl mx-auto space-y-6 min-w-0">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl sm:text-3xl font-black text-white">Criar Evento</h1>
         <p className="text-white/50 mt-1 text-sm">Monte o evento dos seus sonhos passo a passo.</p>
