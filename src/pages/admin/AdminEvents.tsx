@@ -5,7 +5,7 @@ import { eventService } from '@/services/event.service'
 import { Skeleton } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate } from '@/utils/cn'
-import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search, Trash2 } from 'lucide-react'
+import { Check, X, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock, Search, Trash2, Pencil } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { toast } from 'sonner'
 import { AdminPreferenceView } from '@/components/admin/AdminPreferenceView'
@@ -31,6 +31,8 @@ export default function AdminEvents() {
   const [cancelTarget, setCancelTarget] = useState<AdminEvent | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminEvent | null>(null)
   const [selectedItems, setSelectedItems] = useState<Record<string, Set<string>>>({})
+  const [editingPrice, setEditingPrice] = useState<Record<string, string>>({})
+  const [savingPrice, setSavingPrice] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
   const { data: events, isLoading } = useQuery({
@@ -60,6 +62,23 @@ export default function AdminEvents() {
 
   function getSelected(event: AdminEvent): Set<string> {
     return selectedItems[event.id] ?? new Set((event.itens ?? []).map(i => i.id))
+  }
+
+  async function savePrice(itemId: string, quantidade: number) {
+    const raw = editingPrice[itemId]
+    const valor = parseFloat(raw?.replace(',', '.'))
+    if (isNaN(valor) || valor < 0) return
+    setSavingPrice(itemId)
+    try {
+      await eventService.updateItemPrice(itemId, valor, quantidade)
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] })
+      toast.success('Valor atualizado!')
+      setEditingPrice(prev => { const n = { ...prev }; delete n[itemId]; return n })
+    } catch {
+      toast.error('Erro ao salvar valor.')
+    } finally {
+      setSavingPrice(null)
+    }
   }
 
   function toggleItem(eventId: string, itemId: string, allIds: string[]) {
@@ -212,12 +231,50 @@ export default function AdminEvents() {
                               <span className={`flex-1 ${
                                 isPending && !checked ? 'line-through text-white/30' : 'text-white/80'
                               }`}>{item.produto?.nome}</span>
-                              <div className="flex items-center gap-3 flex-shrink-0">
+                              <div className="flex items-center gap-2 flex-shrink-0">
                                 {!isPending && item.confirmado === false && (
                                   <span className="text-red-400 text-xs">Não incluído</span>
                                 )}
                                 <span className="text-white/40">x{item.quantidade}</span>
-                                <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                                {editingPrice[item.id] !== undefined ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-white/40 text-xs">R$</span>
+                                    <input
+                                      autoFocus
+                                      className="w-20 bg-white/10 border border-[#c9a84c]/50 rounded-lg px-2 py-0.5 text-[#c9a84c] text-sm font-medium outline-none focus:border-[#c9a84c]"
+                                      value={editingPrice[item.id]}
+                                      onChange={e => setEditingPrice(prev => ({ ...prev, [item.id]: e.target.value }))}
+                                      onKeyDown={e => {
+                                        if (e.key === 'Enter') savePrice(item.id, item.quantidade)
+                                        if (e.key === 'Escape') setEditingPrice(prev => { const n = { ...prev }; delete n[item.id]; return n })
+                                      }}
+                                    />
+                                    <button
+                                      onClick={() => savePrice(item.id, item.quantidade)}
+                                      disabled={savingPrice === item.id}
+                                      className="text-green-400 hover:text-green-300 cursor-pointer disabled:opacity-50"
+                                    >
+                                      <Check size={14} />
+                                    </button>
+                                    <button
+                                      onClick={() => setEditingPrice(prev => { const n = { ...prev }; delete n[item.id]; return n })}
+                                      className="text-white/30 hover:text-white/60 cursor-pointer"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1 group/price">
+                                    <span className="text-[#c9a84c] font-medium">{formatCurrency(item.subtotal)}</span>
+                                    <button
+                                      onClick={() => setEditingPrice(prev => ({ ...prev, [item.id]: String(item.valor_unitario) }))}
+                                      className="opacity-0 group-hover/price:opacity-100 text-white/30 hover:text-[#c9a84c] transition-opacity cursor-pointer"
+                                      title="Editar valor"
+                                    >
+                                      <Pencil size={12} />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                             <AdminPreferenceView

@@ -143,6 +143,14 @@ export const eventService = {
     if (error) throw error
   },
 
+  async updateItemPrice(itemId: string, novoValor: number, quantidade: number) {
+    const { error } = await supabase
+      .from('evento_itens')
+      .update({ valor_unitario: novoValor, subtotal: novoValor * quantidade })
+      .eq('id', itemId)
+    if (error) throw error
+  },
+
   async deleteEvent(id: string) {
     const { error } = await supabase
       .from('eventos')

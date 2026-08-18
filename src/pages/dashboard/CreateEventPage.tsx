@@ -156,25 +156,25 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-black text-white">Criar Evento</h1>
-        <p className="text-white/50 mt-1">Monte o evento dos seus sonhos passo a passo.</p>
+        <h1 className="text-2xl sm:text-3xl font-black text-white">Criar Evento</h1>
+        <p className="text-white/50 mt-1 text-sm">Monte o evento dos seus sonhos passo a passo.</p>
       </motion.div>
 
       {/* Stepper */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-2">
+      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
         {steps.map((s, i) => (
-          <div key={s} className="flex items-center gap-1.5 flex-shrink-0">
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+          <div key={s} className="flex items-center gap-1 flex-shrink-0">
+            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
               i === step ? 'gold-gradient text-black' :
               i < step ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
               'glass text-white/40'
             }`}>
-              {i < step ? <Check size={12} /> : <span>{i + 1}</span>}
+              {i < step ? <Check size={11} /> : <span>{i + 1}</span>}
               <span className={i !== step && i > step ? 'hidden sm:inline' : ''}>{s}</span>
             </div>
-            {i < steps.length - 1 && <ChevronRight size={12} className="text-white/20 flex-shrink-0" />}
+            {i < steps.length - 1 && <ChevronRight size={11} className="text-white/20 flex-shrink-0" />}
           </div>
         ))}
       </div>
@@ -190,15 +190,14 @@ export default function CreateEventPage() {
           {/* Step 0: Tipo */}
           {step === 0 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-bold text-white">Qual o tipo do evento?</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              <h2 className="text-lg sm:text-xl font-bold text-white">Qual o tipo do evento?</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {eventTypes.map(et => (
                   <motion.button
                     key={et.value}
-                    whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setTipo(et.value)}
-                    className={`glass rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                    className={`glass rounded-2xl p-4 sm:p-6 text-center cursor-pointer transition-all ${
                       tipo === et.value ? 'border-[#c9a84c] glass-gold' : 'hover:border-white/20'
                     }`}
                   >
@@ -207,7 +206,7 @@ export default function CreateEventPage() {
                   </motion.button>
                 ))}
               </div>
-              <Button onClick={() => tipo && setStep(1)} disabled={!tipo} size="lg">
+              <Button onClick={() => tipo && setStep(1)} disabled={!tipo} className="w-full sm:w-auto">
                 Continuar <ChevronRight size={16} />
               </Button>
             </div>
@@ -215,26 +214,26 @@ export default function CreateEventPage() {
 
           {/* Step 1: Dados */}
           {step === 1 && (
-            <div className="space-y-6 max-w-xl">
-              <h2 className="text-xl font-bold text-white">Dados do evento</h2>
+            <div className="space-y-4 w-full max-w-xl">
+              <h2 className="text-lg sm:text-xl font-bold text-white">Dados do evento</h2>
               <Input label="Nome do evento" placeholder="Ex: Casamento João e Maria" error={form2.formState.errors.nome_evento?.message} {...form2.register('nome_evento')} />
               <Input label="Data" type="date" error={form2.formState.errors.data?.message} {...form2.register('data')} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <Input label="Horário início" type="time" error={form2.formState.errors.horario_inicio?.message} {...form2.register('horario_inicio')} />
                 <Input label="Horário fim" type="time" error={form2.formState.errors.horario_fim?.message} {...form2.register('horario_fim')} />
               </div>
               <Input label="Quantidade de pessoas" type="number" placeholder="Ex: 200" error={form2.formState.errors.quantidade_pessoas?.message} {...form2.register('quantidade_pessoas')} />
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(0)}>Voltar</Button>
-                <Button onClick={handleNext}>Continuar <ChevronRight size={16} /></Button>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setStep(0)} className="flex-1 sm:flex-none">Voltar</Button>
+                <Button onClick={handleNext} className="flex-1 sm:flex-none">Continuar <ChevronRight size={16} /></Button>
               </div>
             </div>
           )}
 
           {/* Step 2: Local */}
           {step === 2 && (
-            <div className="space-y-6 max-w-xl">
-              <h2 className="text-xl font-bold text-white">Local do evento</h2>
+            <div className="space-y-4 w-full max-w-xl">
+              <h2 className="text-lg sm:text-xl font-bold text-white">Local do evento</h2>
               <Input
                 label="CEP"
                 placeholder="00000-000"
@@ -248,27 +247,27 @@ export default function CreateEventPage() {
                 })}
               />
               <Input label="Endereço" placeholder="Rua, Avenida..." error={form3.formState.errors.endereco?.message} {...form3.register('endereco')} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <Input label="Número" placeholder="123" error={form3.formState.errors.numero?.message} {...form3.register('numero')} />
                 <Input label="Complemento" placeholder="Apto, Bloco..." {...form3.register('complemento')} />
               </div>
               <Input label="Bairro" error={form3.formState.errors.bairro?.message} {...form3.register('bairro')} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <Input label="Cidade" error={form3.formState.errors.cidade?.message} {...form3.register('cidade')} />
                 <Input label="Estado" placeholder="SP" error={form3.formState.errors.estado?.message} {...form3.register('estado')} />
               </div>
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
-                <Button onClick={handleNext}>Continuar <ChevronRight size={16} /></Button>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setStep(1)} className="flex-1 sm:flex-none">Voltar</Button>
+                <Button onClick={handleNext} className="flex-1 sm:flex-none">Continuar <ChevronRight size={16} /></Button>
               </div>
             </div>
           )}
 
           {/* Step 3: Aniversariante */}
           {step === 3 && (
-            <div className="space-y-6 max-w-xl">
-              <h2 className="text-xl font-bold text-white">Tem aniversariante?</h2>
-              <div className="flex gap-4">
+            <div className="space-y-4 w-full max-w-xl">
+              <h2 className="text-lg sm:text-xl font-bold text-white">Tem aniversariante?</h2>
+              <div className="flex gap-3">
                 {[true, false].map(v => (
                   <button
                     key={String(v)}
@@ -287,56 +286,88 @@ export default function CreateEventPage() {
                   <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
                 </motion.div>
               )}
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
-                <Button onClick={() => setStep(4)}>Continuar <ChevronRight size={16} /></Button>
+              <div className="flex gap-3 pt-2">
+                <Button variant="outline" onClick={() => setStep(2)} className="flex-1 sm:flex-none">Voltar</Button>
+                <Button onClick={() => setStep(4)} className="flex-1 sm:flex-none">Continuar <ChevronRight size={16} /></Button>
               </div>
             </div>
           )}
 
           {/* Step 4: Serviços */}
           {step === 4 && (
-            <div className="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-4">
-                <h2 className="text-xl font-bold text-white">Selecione os serviços</h2>
+            <div className="flex flex-col gap-6">
+              {/* Cart summary - aparece primeiro no mobile */}
+              <div className="glass-gold rounded-2xl p-4 sm:p-5 space-y-4">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart size={18} className="text-[#c9a84c]" />
+                  <h3 className="text-white font-bold">Resumo do pedido</h3>
+                </div>
+                {cart.length === 0 ? (
+                  <p className="text-white/40 text-sm text-center py-2">Nenhum serviço adicionado</p>
+                ) : (
+                  <div className="space-y-2">
+                    {cart.map(item => (
+                      <div key={item.produto.id} className="flex items-center justify-between text-sm">
+                        <span className="text-white/70 truncate flex-1">{item.produto.nome}</span>
+                        <span className="text-white/50 ml-2">x{item.quantidade}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="border-t border-white/10 pt-3">
+                  <p className="text-white/40 text-xs text-center">O valor será apresentado após a confirmação.</p>
+                </div>
+                <Button
+                  className="w-full"
+                  loading={createMutation.isPending}
+                  onClick={() => createMutation.mutate()}
+                  disabled={cart.length === 0}
+                >
+                  Solicitar Orçamento
+                </Button>
+                <p className="text-white/30 text-xs text-center">Nossa equipe entrará em contato em até 24h</p>
+              </div>
 
+              {/* Lista de serviços */}
+              <div className="space-y-4">
+                <h2 className="text-lg sm:text-xl font-bold text-white">Selecione os serviços</h2>
                 <ProductSearch
                   products={products ?? []}
                   onSelect={addToCart}
                   placeholder="Buscar serviço... ex: DJ, foto, brinquedos"
                 />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {products?.map(product => {
                     const inCart = cart.find(i => i.produto.id === product.id)
                     return (
                       <motion.div
                         key={product.id}
-                        whileHover={{ y: -2 }}
-                        className={`glass rounded-xl p-4 transition-all ${inCart ? 'border-[#c9a84c]/40' : ''}`}
+                        whileTap={{ scale: 0.98 }}
+                        className={`glass rounded-xl p-3 sm:p-4 transition-all ${inCart ? 'border-[#c9a84c]/40' : ''}`}
                       >
                         <div className="flex gap-3">
                           <img
                             src={product.imagens?.[0]?.url || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=100&q=80'}
                             alt={product.nome}
-                            className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
                             <p className="text-white font-medium text-sm truncate">{product.nome}</p>
-                            <p className="text-white/50 text-xs line-clamp-1">{product.descricao}</p>
+                            <p className="text-white/50 text-xs line-clamp-2">{product.descricao}</p>
                           </div>
                         </div>
                         {inCart ? (
                           <div className="flex items-center justify-between mt-3">
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => updateQty(product.id, inCart.quantidade - 1)} className="w-7 h-7 glass rounded-full flex items-center justify-center text-white hover:bg-white/10 cursor-pointer">
-                                <Minus size={12} />
+                            <div className="flex items-center gap-3">
+                              <button onClick={() => updateQty(product.id, inCart.quantidade - 1)} className="w-8 h-8 glass rounded-full flex items-center justify-center text-white hover:bg-white/10 cursor-pointer">
+                                <Minus size={13} />
                               </button>
                               <span className="text-white font-medium w-6 text-center">{inCart.quantidade}</span>
-                              <button onClick={() => updateQty(product.id, inCart.quantidade + 1)} className="w-7 h-7 glass rounded-full flex items-center justify-center text-white hover:bg-white/10 cursor-pointer">
-                                <Plus size={12} />
+                              <button onClick={() => updateQty(product.id, inCart.quantidade + 1)} className="w-8 h-8 glass rounded-full flex items-center justify-center text-white hover:bg-white/10 cursor-pointer">
+                                <Plus size={13} />
                               </button>
                             </div>
+                            <span className="text-green-400 text-xs font-medium">Adicionado</span>
                           </div>
                         ) : (
                           <Button size="sm" className="w-full mt-3" onClick={() => addToCart(product)}>
@@ -347,47 +378,7 @@ export default function CreateEventPage() {
                     )
                   })}
                 </div>
-
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(3)}>Voltar</Button>
-                </div>
-              </div>
-
-              {/* Cart summary */}
-              <div className="lg:sticky lg:top-8 h-fit order-first lg:order-last">
-                <div className="glass-gold rounded-2xl p-5 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <ShoppingCart size={18} className="text-[#c9a84c]" />
-                    <h3 className="text-white font-bold">Resumo</h3>
-                  </div>
-
-                  {cart.length === 0 ? (
-                    <p className="text-white/40 text-sm text-center py-4">Nenhum serviço adicionado</p>
-                  ) : (
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {cart.map(item => (
-                        <div key={item.produto.id} className="flex items-center justify-between text-sm">
-                          <span className="text-white/70 truncate flex-1">{item.produto.nome}</span>
-                          <span className="text-white/50 mx-2">x{item.quantidade}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="border-t border-white/10 pt-3">
-                    <p className="text-white/40 text-xs text-center">O valor do pacote será apresentado após a confirmação.</p>
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    loading={createMutation.isPending}
-                    onClick={() => createMutation.mutate()}
-                    disabled={cart.length === 0}
-                  >
-                    Solicitar Orçamento
-                  </Button>
-                  <p className="text-white/30 text-xs text-center">Nossa equipe entrará em contato em até 24h</p>
-                </div>
+                <Button variant="outline" onClick={() => setStep(3)} className="w-full sm:w-auto">Voltar</Button>
               </div>
             </div>
           )}

@@ -115,7 +115,7 @@ export function DashboardLayout() {
           <span className="text-white font-semibold">Painel</span>
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
           <Outlet />
         </main>
       </div>
