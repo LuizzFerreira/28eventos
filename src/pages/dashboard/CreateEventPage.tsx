@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { Check, ChevronRight, Minus, Plus, ShoppingCart } from 'lucide-react'
 import { ProductSearch } from '@/components/ui/ProductSearch'
+import { ServiceDetailModal } from '@/components/ui/ServiceDetailModal'
 import type { EventType, Product } from '@/types'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
@@ -59,6 +60,7 @@ export default function CreateEventPage() {
   const [idadeAniversariante, setIdadeAniversariante] = useState('')
   const [cart, setCart] = useState<{ produto: Product; quantidade: number }[]>([])
   const [_eventId, setEventId] = useState<string | null>(null)
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null)
 
   const { profile } = useAuth()
   const navigate = useNavigate()
@@ -167,6 +169,14 @@ export default function CreateEventPage() {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 min-w-0">
+      <ServiceDetailModal
+        product={detailProduct}
+        onClose={() => setDetailProduct(null)}
+        onAddToEvent={() => {
+          if (detailProduct) addToCart(detailProduct)
+          setDetailProduct(null)
+        }}
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl sm:text-3xl font-black text-white">Criar Evento</h1>
         <p className="text-white/50 mt-1 text-sm">Monte o evento dos seus sonhos passo a passo.</p>
@@ -333,7 +343,8 @@ export default function CreateEventPage() {
                       <motion.div
                         key={product.id}
                         whileTap={{ scale: 0.98 }}
-                        className={`glass rounded-xl p-3 sm:p-4 transition-all ${inCart ? 'border-[#c9a84c]/40' : ''}`}
+                        className={`glass rounded-xl p-3 sm:p-4 transition-all cursor-pointer ${inCart ? 'border-[#c9a84c]/40' : ''}`}
+                        onClick={() => setDetailProduct(product)}
                       >
                         <div className="flex gap-3">
                           <img
@@ -347,7 +358,7 @@ export default function CreateEventPage() {
                           </div>
                         </div>
                         {inCart ? (
-                          <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center justify-between mt-3" onClick={e => e.stopPropagation()}>
                             <div className="flex items-center gap-3">
                               <button onClick={() => updateQty(product.id, inCart.quantidade - 1)} className="w-8 h-8 glass rounded-full flex items-center justify-center text-white hover:bg-white/10 cursor-pointer">
                                 <Minus size={13} />
@@ -360,7 +371,7 @@ export default function CreateEventPage() {
                             <span className="text-green-400 text-xs font-medium">Adicionado</span>
                           </div>
                         ) : (
-                          <Button size="sm" className="w-full mt-3" onClick={() => addToCart(product)}>
+                          <Button size="sm" className="w-full mt-3" onClick={e => { e.stopPropagation(); addToCart(product) }}>
                             <Plus size={14} /> Adicionar
                           </Button>
                         )}
