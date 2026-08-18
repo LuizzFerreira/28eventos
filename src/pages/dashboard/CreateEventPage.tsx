@@ -18,7 +18,10 @@ import type { EventType, Product } from '@/types'
 
 const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
 
-const steps = ['Tipo', 'Dados', 'Local', 'Aniversariante', 'Serviços']
+// Tipos que sempre têm aniversariante — pula a pergunta e vai direto aos campos
+const SEMPRE_ANIVERSARIANTE: EventType[] = ['aniversario', '15_anos', 'infantil']
+// Tipos que nunca têm aniversariante — pula o step inteiro
+const NUNCA_ANIVERSARIANTE: EventType[] = ['casamento', 'corporativo', 'formatura', 'outro']
 
 const step2Schema = z.object({
   nome_evento: z.string().min(3, 'Nome obrigatório'),
@@ -47,6 +50,9 @@ const eventTypes: { value: EventType; label: string }[] = [
   { value: 'aniversario', label: 'Aniversário' },
   { value: 'outro', label: 'Outro' },
 ]
+
+// Steps visíveis para o indicador (sem "Aniversariante" pois é condicional)
+const STEP_LABELS = ['Tipo', 'Dados', 'Local', 'Serviços']
 
 export default function CreateEventPage() {
   const [step, setStep] = useState(0)
@@ -151,9 +157,25 @@ export default function CreateEventPage() {
     if (step === 2) {
       const valid = await form3.trigger()
       if (!valid) return
+      // Após local: decide se mostra step de aniversariante
+      if (tipo && NUNCA_ANIVERSARIANTE.includes(tipo)) {
+        setPossuiAniversariante(false)
+        setStep(4) // pula direto para serviços
+        return
+      }
+      if (tipo && SEMPRE_ANIVERSARIANTE.includes(tipo)) {
+        setPossuiAniversariante(true)
+        setStep(3) // vai para campos do aniversariante (sem a pergunta sim/não)
+        return
+      }
     }
     setStep(s => s + 1)
   }
+
+  // Indicador de progresso simplificado
+  // step 0=Tipo, 1=Dados, 2=Local, 3=Aniversariante(condicional), 4=Serviços
+  // Mapeia para os 4 labels visíveis
+  const indicatorIndex = step === 4 ? 3 : step === 3 ? 2 : step
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 min-w-0">
@@ -162,19 +184,21 @@ export default function CreateEventPage() {
         <p className="text-white/50 mt-1 text-sm">Monte o evento dos seus sonhos passo a passo.</p>
       </motion.div>
 
-      {/* Stepper */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
-        {steps.map((s, i) => (
-          <div key={s} className="flex items-center gap-1 flex-shrink-0">
-            <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-              i === step ? 'gold-gradient text-black' :
-              i < step ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
-              'glass text-white/40'
+      {/* Indicador de progresso simples */}
+      <div className="flex items-center gap-2">
+        {STEP_LABELS.map((label, i) => (
+          <div key={label} className="flex items-center gap-2 flex-shrink-0">
+            <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              i === indicatorIndex ? 'gold-gradient text-black' :
+              i < indicatorIndex ? 'bg-green-500/20 text-green-400' :
+              'bg-white/5 text-white/30'
             }`}>
-              {i < step ? <Check size={11} /> : <span>{i + 1}</span>}
-              <span className={i !== step && i > step ? 'hidden sm:inline' : ''}>{s}</span>
+              {i < indicatorIndex ? <Check size={10} /> : <span>{i + 1}</span>}
+              <span>{label}</span>
             </div>
-            {i < steps.length - 1 && <ChevronRight size={11} className="text-white/20 flex-shrink-0" />}
+            {i < STEP_LABELS.length - 1 && (
+              <div className={`h-px w-4 sm:w-8 flex-shrink-0 transition-all ${i < indicatorIndex ? 'bg-green-500/40' : 'bg-white/10'}`} />
+            )}
           </div>
         ))}
       </div>
@@ -185,7 +209,7 @@ export default function CreateEventPage() {
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -30 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.25 }}
         >
           {/* Step 0: Tipo */}
           {step === 0 && (
@@ -263,28 +287,40 @@ export default function CreateEventPage() {
             </div>
           )}
 
-          {/* Step 3: Aniversariante */}
+          {/* Step 3: Aniversariante (condicional) */}
           {step === 3 && (
             <div className="space-y-4 w-full max-w-xl">
-              <h2 className="text-lg sm:text-xl font-bold text-white">Tem aniversariante?</h2>
-              <div className="flex gap-3">
-                {[true, false].map(v => (
-                  <button
-                    key={String(v)}
-                    onClick={() => setPossuiAniversariante(v)}
-                    className={`flex-1 glass rounded-xl py-4 text-center font-medium transition-all cursor-pointer ${
-                      possuiAniversariante === v ? 'glass-gold text-[#c9a84c]' : 'text-white/60 hover:text-white'
-                    }`}
-                  >
-                    {v ? 'Sim' : 'Não'}
-                  </button>
-                ))}
-              </div>
-              {possuiAniversariante && (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+              {tipo && SEMPRE_ANIVERSARIANTE.includes(tipo) ? (
+                // Já sabemos que tem aniversariante — pede direto as infos
+                <>
+                  <h2 className="text-lg sm:text-xl font-bold text-white">Dados do aniversariante</h2>
                   <Input label="Nome do aniversariante" placeholder="Nome completo" value={nomeAniversariante} onChange={e => setNomeAniversariante(e.target.value)} />
                   <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
-                </motion.div>
+                </>
+              ) : (
+                // Pergunta sim/não (para tipos ambíguos — não deve chegar aqui com a lógica atual)
+                <>
+                  <h2 className="text-lg sm:text-xl font-bold text-white">Tem aniversariante?</h2>
+                  <div className="flex gap-3">
+                    {[true, false].map(v => (
+                      <button
+                        key={String(v)}
+                        onClick={() => setPossuiAniversariante(v)}
+                        className={`flex-1 glass rounded-xl py-4 text-center font-medium transition-all cursor-pointer ${
+                          possuiAniversariante === v ? 'glass-gold text-[#c9a84c]' : 'text-white/60 hover:text-white'
+                        }`}
+                      >
+                        {v ? 'Sim' : 'Não'}
+                      </button>
+                    ))}
+                  </div>
+                  {possuiAniversariante && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                      <Input label="Nome do aniversariante" placeholder="Nome completo" value={nomeAniversariante} onChange={e => setNomeAniversariante(e.target.value)} />
+                      <Input label="Idade" type="number" placeholder="Ex: 15" value={idadeAniversariante} onChange={e => setIdadeAniversariante(e.target.value)} />
+                    </motion.div>
+                  )}
+                </>
               )}
               <div className="flex gap-3 pt-2">
                 <Button variant="outline" onClick={() => setStep(2)} className="flex-1 sm:flex-none">Voltar</Button>
@@ -296,7 +332,7 @@ export default function CreateEventPage() {
           {/* Step 4: Serviços */}
           {step === 4 && (
             <div className="flex flex-col gap-6">
-              {/* Cart summary - aparece primeiro no mobile */}
+              {/* Cart summary */}
               <div className="glass-gold rounded-2xl p-4 sm:p-5 space-y-4">
                 <div className="flex items-center gap-2">
                   <ShoppingCart size={18} className="text-[#c9a84c]" />
@@ -378,7 +414,11 @@ export default function CreateEventPage() {
                     )
                   })}
                 </div>
-                <Button variant="outline" onClick={() => setStep(3)} className="w-full sm:w-auto">Voltar</Button>
+                <Button variant="outline" onClick={() => {
+                  // Voltar: se tipo nunca tem aniversariante, volta para local; senão volta para step 3
+                  if (tipo && NUNCA_ANIVERSARIANTE.includes(tipo)) setStep(2)
+                  else setStep(3)
+                }} className="w-full sm:w-auto">Voltar</Button>
               </div>
             </div>
           )}
